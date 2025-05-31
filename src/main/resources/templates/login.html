@@ -12,6 +12,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
       body {
         min-height: 100vh;
@@ -222,12 +223,21 @@
         </div>
 
         <div class="login-body">
-          <div th:if="${param.error}" class="error-message">
+          <div id="error-message" class="error-message" style="display: none">
             <i class="fas fa-exclamation-triangle"></i>
-            Sai tên đăng nhập hoặc mật khẩu!
+            <span id="error-text"></span>
           </div>
 
-          <form method="post" th:action="@{/login}">
+          <div
+            id="success-message"
+            class="alert alert-success"
+            style="display: none"
+          >
+            <i class="fas fa-check-circle"></i>
+            <span id="success-text"></span>
+          </div>
+
+          <form id="loginForm">
             <div class="form-group">
               <label for="username" class="form-label">
                 <i class="fas fa-user me-1"></i>Tài khoản
@@ -264,8 +274,9 @@
               </div>
             </div>
 
-            <button type="submit" class="btn-login">
-              <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập
+            <button type="submit" id="loginBtn" class="btn-login">
+              <i class="fas fa-sign-in-alt me-2"></i>
+              <span id="loginBtnText">Đăng nhập</span>
             </button>
           </form>
         </div>
@@ -279,5 +290,111 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // Configure axios defaults
+      axios.defaults.withCredentials = true;
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+          const loginBtn = document.getElementById("loginBtn");
+          const loginBtnText = document.getElementById("loginBtnText");
+          const errorMessage = document.getElementById("error-message");
+          const successMessage = document.getElementById("success-message");
+          const errorText = document.getElementById("error-text");
+          const successText = document.getElementById("success-text");
+
+          // Hide previous messages
+          errorMessage.style.display = "none";
+          successMessage.style.display = "none";
+
+          // Show loading state
+          loginBtn.disabled = true;
+          loginBtnText.innerHTML =
+            '<i class="fas fa-spinner fa-spin me-2"></i>Đang đăng nhập...';
+
+          try {
+            const response = await axios.post(
+              "/api/client/auth/login",
+              {
+                username: username,
+                password: password,
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                credentials: "include",
+                withCredentials: true,
+              }
+            );
+
+            // Login successful
+            if (response.data.token) {
+              successText.textContent =
+                "Đăng nhập thành công! Đang chuyển hướng...";
+              successMessage.style.display = "block";
+
+              // Store token if needed (optional)
+              localStorage.setItem("authToken", response.data.token);
+
+
+              // Redirect to home page or dashboard after short delay
+              setTimeout(() => {
+                window.location.href = response.data.redirectUrl || "/";
+              }, 1500);
+            }
+          } catch (error) {
+            // Handle login error
+            let errorMsg = "Đã xảy ra lỗi. Vui lòng thử lại.";
+
+            if (
+              error.response &&
+              error.response.data &&
+              error.response.data.error
+            ) {
+              errorMsg = error.response.data.error;
+            } else if (error.response && error.response.status === 401) {
+              errorMsg = "Sai tài khoản hoặc mật khẩu!";
+            }
+
+            errorText.textContent = errorMsg;
+            errorMessage.style.display = "block";
+          } finally {
+            // Reset button state
+            loginBtn.disabled = false;
+            loginBtnText.innerHTML =
+              '<i class="fas fa-sign-in-alt me-2"></i>Đăng nhập';
+          }
+        });
+
+      // Add some styling for loading state
+      const style = document.createElement("style");
+      style.textContent = `
+        .btn-login:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+        
+        .alert-success {
+          background: rgba(34, 197, 94, 0.1);
+          color: #16a34a;
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+          border-left: 4px solid #16a34a;
+          margin-bottom: 1.5rem;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
   </body>
 </html>
