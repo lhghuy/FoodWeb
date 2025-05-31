@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Quản lý bàn</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js" integrity="sha512-FPlUpimug7gt7Hn7swE8N2pHw/+oQMq/+R/hH/2hZ43VOQ+Kjh25rQzuLyPz7aUWKlRpI7wXbY6+U3oFPGjPOA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
          .table-grid-container {
             display: grid;
@@ -100,7 +102,7 @@
         }
         /* Modal background overlay */
         .modal-overlay {
-            display: none;
+            /* display: none; */
             position: fixed;
             top: 0;
             left: 0;
@@ -166,6 +168,23 @@
             background-color: #c82333;
         }
 
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -177,7 +196,7 @@
     </ul>
 </div>
 
-<div class="main-content">
+<div class="main-content" x-data="tablesApp()">
     <div class="header">
         <h1>Quản lý bàn</h1>
         <div class="user-info">
@@ -190,75 +209,219 @@
 
     <div class="card">
         <h3>Danh sách bàn</h3>
-        <div class="table-grid-container">
-            <div class="table-item" th:each="table : ${tables}">
-                <div class="table-number" th:text="${table.tableNumber}"></div>
-                <div class="status-tag"
-                     th:classappend="${table.status == 'Trong' ? 'status-trong' : 'status-dangphucvu'}"
-                     th:text="${table.status == 'Trong' ? 'Trống' : 'Đang phục vụ'}"></div>
-                <div class="table-actions">
-                    <a th:href="@{/employee/tables/{id}(id=${table.tableID})}" class="btn-detail">Chi tiết</a>
-                    <form th:if="${table.status == 'Trong'}"
-                          th:action="@{/employee/tables/{id}/assign(id=${table.tableID})}" method="post"
-                          class="assign-form">
-                        <input type="text" th:id="'employee-' + ${table.tableID}" name="employee"
-                               value="Nhân viên hiện tại" readonly style="display: none;"/>
-                        <button type="submit" class="btn-assign">Gán bàn</button>
-                    </form>
-                </div>
+        
+        <!-- Loading indicator -->
+        <div x-show="loading" class="text-center">
+            <p>Đang tải...</p>
+        </div>
 
-                <button type="button" class="btn-unassign"
-                        th:if="${table.status == 'DangPhucVu'}"
-                        th:attr="data-table-id=${table.tableID}"
-                        onclick="openPaymentModal(this)">
-                    Thanh toán
-                </button>
-            </div>
+        <!-- Error message -->
+        <div x-show="error" class="error-message" x-text="error"></div>
+
+        <!-- Tables grid -->
+        <div class="table-grid-container" x-show="!loading">
+            <template x-for="table in tables" :key="table.tableID">
+                <div class="table-item">
+                    <div class="table-number" x-text="table.tableNumber"></div>
+                    <div class="status-tag"
+                         :class="table.status === 'Trong' ? 'status-trong' : 'status-dangphucvu'"
+                         x-text="table.status === 'Trong' ? 'Trống' : 'Đang phục vụ'"></div>
+                    
+                    <div class="table-actions">
+                        <a :href="`/employee/tables/${table.tableID}`" class="btn-detail">Chi tiết</a>
+                        
+                        <!-- Assign button for empty tables -->
+                        <div x-show="table.status === 'Trong'">
+                            <button 
+                                type="button" 
+                                class="btn-assign"
+                                :disabled="assigningTable === table.tableID"
+                                @click="assignTable(table.tableID)"
+                                x-text="assigningTable === table.tableID ? 'Đang gán...' : 'Gán bàn'">
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Checkout button for occupied tables -->
+                    <button 
+                        type="button" 
+                        class="btn-unassign"
+                        x-show="table.status === 'DangPhucVu'"
+                        @click="openPaymentModal(table.tableID)">
+                        Thanh toán
+                    </button>
+
+                    <!-- Error/Success messages for individual tables -->
+                    <div x-show="tableMessages[table.tableID]?.error" 
+                         class="error-message" 
+                         x-text="tableMessages[table.tableID]?.error"></div>
+                    <div x-show="tableMessages[table.tableID]?.success" 
+                         class="success-message" 
+                         x-text="tableMessages[table.tableID]?.success"></div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentOverlay" class="modal-overlay" x-show="showPaymentModal" x-transition>
+        <div class="modal-box">
+            <h3>Thông tin khách hàng</h3>
+            <form @submit.prevent="submitCheckout">
+                <label>Họ tên:</label>
+                <input type="text" x-model="checkoutForm.fullName" required>
+                
+                <label>Số điện thoại:</label>
+                <input type="text" 
+                       x-model="checkoutForm.phone" 
+                       required 
+                       pattern="\d{10}" 
+                       maxlength="10" 
+                       minlength="10" 
+                       inputmode="numeric"
+                       title="Số điện thoại phải gồm đúng 10 chữ số">
+                
+                <div x-show="checkoutError" class="error-message" x-text="checkoutError"></div>
+                
+                <div style="text-align: right;">
+                    <button type="submit" :disabled="checkingOut">
+                        <span x-text="checkingOut ? 'Đang xử lý...' : 'Xác nhận'"></span>
+                    </button>
+                    <button type="button" @click="closePaymentModal()" :disabled="checkingOut">Hủy</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<div id="paymentOverlay" class="modal-overlay">
-    <div class="modal-box">
-        <h3>Thông tin khách hàng</h3>
-        <form id="paymentForm" method="post">
-            <input type="hidden" id="modal-table-id" name="tableId" />
-            <label>Họ tên:</label>
-            <input type="text" name="fullName" required>
-            <label>Số điện thoại:</label>
-            <input type="text" name="phone" required 
-                   pattern="\d{10}" 
-                   maxlength="10" 
-                   minlength="10" 
-                   inputmode="numeric"
-                   title="Số điện thoại phải gồm đúng 10 chữ số">
-            <div style="text-align: right;">
-                <button type="submit">Xác nhận</button>
-                <button type="button" onclick="closePaymentModal()">Hủy</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <script>
-    function openPaymentModal(button) {
-        const tableId = button.getAttribute('data-table-id');
-        document.getElementById('modal-table-id').value = tableId;
-        document.getElementById('paymentForm').action = `/employee/tables/${tableId}/checkout`;
-        document.getElementById('paymentOverlay').style.display = 'block';
-    }
+function tablesApp() {
+    return {
+        tables: [],
+        loading: true,
+        error: '',
+        assigningTable: null,
+        tableMessages: {},
+        showPaymentModal: false,
+        selectedTableId: null,
+        checkoutForm: {
+            fullName: '',
+            phone: ''
+        },
+        checkoutError: '',
+        checkingOut: false,
 
-    function closePaymentModal() {
-        document.getElementById('paymentOverlay').style.display = 'none';
-    }
+        async init() {
+            await this.loadTables();
+           
+        },
 
-    document.getElementById("paymentForm").addEventListener("submit", function(e) {
-        const phone = this.phone.value.trim();
-        if (!/^\d{10}$/.test(phone)) {
-            alert("Số điện thoại phải gồm đúng 10 chữ số.");
-            e.preventDefault();
+        async loadTables() {
+            try {
+                this.loading = true;
+                this.error = '';
+                const response = await axios.get('/api/employee/tables');
+                this.tables = response.data;
+            } catch (error) {
+                console.error('Error loading tables:', error);
+                this.error = 'Không thể tải danh sách bàn. Vui lòng thử lại.';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async assignTable(tableId) {
+            try {
+                this.assigningTable = tableId;
+                this.clearTableMessage(tableId);
+                
+                const response = await axios.post(`/api/employee/tables/${tableId}/assign`);
+                
+                this.setTableMessage(tableId, 'success', 'Gán bàn thành công!');
+                
+                await this.loadTables();
+                
+                setTimeout(() => {
+                    this.clearTableMessage(tableId);
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error assigning table:', error);
+                const errorMessage = error.response?.data || 'Không thể gán bàn. Vui lòng thử lại.';
+                this.setTableMessage(tableId, 'error', errorMessage);
+                
+                setTimeout(() => {
+                    this.clearTableMessage(tableId);
+                }, 5000);
+            } finally {
+                this.assigningTable = null;
+            }
+        },
+
+        openPaymentModal(tableId) {
+            console.log(tableId);
+            this.selectedTableId = tableId;
+            this.showPaymentModal = true;
+            this.checkoutForm = { fullName: '', phone: '' };
+            this.checkoutError = '';
+        },
+
+        closePaymentModal() {
+            this.showPaymentModal = false;
+            this.selectedTableId = null;
+            this.checkoutForm = { fullName: '', phone: '' };
+            this.checkoutError = '';
+        },
+
+        async submitCheckout() {
+                const phonePattern = /^\d{10}$/;
+            if (!phonePattern.test(this.checkoutForm.phone.trim())) {
+                this.checkoutError = 'Số điện thoại phải gồm đúng 10 chữ số.';
+                return;
+            }
+
+            try {
+                this.checkingOut = true;
+                this.checkoutError = '';
+                
+                const response = await axios.post(`/api/employee/tables/${this.selectedTableId}/checkout`, {
+                    fullName: this.checkoutForm.fullName.trim(),
+                    phone: this.checkoutForm.phone.trim()
+                });
+
+                this.closePaymentModal();
+                alert("Thanh toán thành công");
+                
+                await this.loadTables();
+                
+                if (response.data.orderId) {
+                    window.location.href = `/employee/tables/order/${response.data.orderId}/bill`;
+                }
+                
+            } catch (error) {
+                console.error('Error during checkout:', error);
+                this.checkoutError = error.response?.data?.error || 'Không thể thanh toán. Vui lòng thử lại.';
+            } finally {
+                this.checkingOut = false;
+            }
+        },
+
+        setTableMessage(tableId, type, message) {
+            if (!this.tableMessages[tableId]) {
+                this.tableMessages[tableId] = {};
+            }
+            this.tableMessages[tableId][type] = message;
+            const otherType = type === 'error' ? 'success' : 'error';
+            this.tableMessages[tableId][otherType] = '';
+        },
+
+        clearTableMessage(tableId) {
+            if (this.tableMessages[tableId]) {
+                this.tableMessages[tableId] = { error: '', success: '' };
+            }
         }
-    });
+    }
+}
 </script>
 </body>
 </html>

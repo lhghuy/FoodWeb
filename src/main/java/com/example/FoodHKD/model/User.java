@@ -3,6 +3,9 @@ package com.example.FoodHKD.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,17 +36,21 @@ public class User {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "createdBy")
+    @JsonManagedReference
     private List<Order> orders;
 
     @OneToMany(mappedBy = "issuedBy")
+    @JsonManagedReference 
     private List<Invoice> invoices;
 
     @OneToMany(mappedBy = "employee")
+    @JsonManagedReference
     private List<TableEntity> tableEntities;
 
 
 
     @OneToMany(mappedBy = "createdBy")
+    @JsonManagedReference
     private List<InventoryLog> inventoryLogs;
 
     public String getAvatar() {

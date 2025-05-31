@@ -37,8 +37,6 @@ public class TableEmployeeController {
 
     @GetMapping
     public String viewTables(Model model) {
-        List<TableEntity> availableTables = tableService.getAvailableTables();
-        model.addAttribute("tables", availableTables);
         return "tables";
     }
 

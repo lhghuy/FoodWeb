@@ -5,6 +5,60 @@
     <title>Chi tiết bàn</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js" integrity="sha512-FPlUpimug7gt7Hn7swE8N2pHw/+oQMq/+R/hH/2hZ43VOQ+Kjh25rQzuLyPz7aUWKlRpI7wXbY6+U3oFPGjPOA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .success-message {
+            color: #28a745;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .modal-overlay {
+            /* display: none; */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+        }
+        
+        .modal-dialog-custom {
+            position: relative;
+            width: auto;
+            margin: 10% auto;
+            max-width: 500px;
+        }
+        
+        .modal-content-custom {
+            background-color: #fff;
+            border-radius: 0.3rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            padding: 1.5rem;
+        }
+    </style>
 </head>
 <body>
 <div class="sidebar">
@@ -15,9 +69,9 @@
     </ul>
 </div>
 
-<div class="main-content">
+<div class="main-content" x-data="tableDetailApp()" x-init="init()">
     <div class="header">
-        <h1>Chi tiết bàn <span th:text="${table.tableNumber}"></span></h1>
+        <h1>Chi tiết bàn <span x-text="tableData.table?.tableNumber || ''"></span></h1>
         <div class="user-info">
             <form th:action="@{/logout}" method="post" style="display:inline;">
                 <button type="submit" class="btn-logout">Đăng xuất</button>
@@ -26,160 +80,347 @@
         </div>
     </div>
 
-    <div class="card detail-container">
-        <h3>Thông tin bàn</h3>
-        <p><strong>Số bàn:</strong> <span th:text="${table.tableNumber}"></span></p>
-        <p><strong>Trạng thái:</strong> <span th:text="${table.status == 'Trong' ? 'Trống' : 'Đang phục vụ'}"></span></p>
-        <p><strong>Nhân viên phụ trách:</strong> <span th:text="${table.employee != null ? table.employee.fullName : 'Chưa có'}"></span></p>
-
-        <h3 class="mt-3">Các món đã gọi</h3>
-        <button class="btn btn-success mb-3" onclick="openAddItemModal()">Thêm món</button>
-        <table class="table" th:if="${not #lists.isEmpty(tableDetails)}">
-            <thead>
-            <tr>
-                <th>Tên món</th>
-                <th>Số lượng</th>
-                <th>Đơn giá</th>
-                <th>Tổng tiền món</th>
-                <th>Tác vụ</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="detail : ${tableDetails}">
-                <td th:text="${detail.foodItem.name}"></td>
-                <td th:text="${detail.quantity}"></td>
-                <td th:text="${#numbers.formatDecimal(detail.foodItem.price, 0, 'POINT', 3, 'COMMA')} + ' vnđ'"></td>
-                <td th:text="${#numbers.formatDecimal(detail.totalPrice, 0, 'POINT', 3, 'COMMA')} + ' vnđ'"></td>
-                <td class="actions">
-                    <button class="btn btn-primary btn-sm mr-2" th:onclick="'openEditItemModal(' + ${detail.tableDetailId} + ')'">Sửa</button>
-                    <button class="btn btn-danger btn-sm" th:onclick="'deleteItem(' + ${detail.tableDetailId} + ')'">Xóa</button>
-                </td>
-            </tr>
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="3" class="text-right font-weight-bold">Tổng tiền:</td>
-                <td class="font-weight-bold">
-                    <span th:text="${#numbers.formatDecimal(totalPrice, 0, 'POINT', 3, 'COMMA')}"></span>đ
-                </td>
-                <td></td>
-            </tr>
-            </tfoot>
-        </table>
-        <p class="alert alert-info" th:if="${#lists.isEmpty(tableDetails)}">Bàn này chưa có món nào.</p>
+    <!-- Loading State -->
+    <div x-show="loading" class="text-center">
+        <div class="loading-spinner"></div>
+        <p>Đang tải thông tin bàn...</p>
     </div>
 
-    <div id="addItemModal" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm món mới</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    <!-- Error State -->
+    <div x-show="error && !loading" class="alert alert-danger" x-text="error"></div>
+
+    <!-- Main Content -->
+    <div x-show="!loading && !error" class="card detail-container">
+        <h3>Thông tin bàn</h3>
+        <p><strong>Số bàn:</strong> <span x-text="tableData.table?.tableNumber"></span></p>
+        <p><strong>Trạng thái:</strong> <span x-text="tableData.table?.status === 'Trong' ? 'Trống' : 'Đang phục vụ'"></span></p>
+        <p><strong>Nhân viên phụ trách:</strong> <span x-text="tableData.table?.employee?.fullName || 'Chưa có'"></span></p>
+
+        <h3 class="mt-3">Các món đã gọi</h3>
+        <button class="btn btn-success mb-3" @click="openAddItemModal()" :disabled="addingItem">
+            <span x-show="!addingItem">Thêm món</span>
+            <span x-show="addingItem">
+                <div class="loading-spinner"></div> Đang tải...
+            </span>
+        </button>
+
+        <!-- Items Table -->
+        <div x-show="tableData.tableDetails && tableData.tableDetails.length > 0">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Tên món</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Tổng tiền món</th>
+                    <th>Tác vụ</th>
+                </tr>
+                </thead>
+                <tbody>
+                <template x-for="detail in tableData.tableDetails" :key="detail.tableDetailId">
+                    <tr>
+                        <td x-text="detail.foodItem.name"></td>
+                        <td x-text="detail.quantity"></td>
+                        <td x-text="formatCurrency(detail.foodItem.price)"></td>
+                        <td x-text="formatCurrency(detail.totalPrice)"></td>
+                        <td class="actions">
+                            <button class="btn btn-primary btn-sm mr-2" 
+                                    @click="openEditItemModal(detail.tableDetailId)"
+                                    :disabled="editingItem === detail.tableDetailId">
+                                <span x-show="editingItem !== detail.tableDetailId">Sửa</span>
+                                <span x-show="editingItem === detail.tableDetailId">
+                                    <div class="loading-spinner"></div>
+                                </span>
+                            </button>
+                            <button class="btn btn-danger btn-sm" 
+                                    @click="deleteItem(detail.tableDetailId)"
+                                    :disabled="deletingItem === detail.tableDetailId">
+                                <span x-show="deletingItem !== detail.tableDetailId">Xóa</span>
+                                <span x-show="deletingItem === detail.tableDetailId">
+                                    <div class="loading-spinner"></div>
+                                </span>
+                            </button>
+                        </td>
+                    </tr>
+                </template>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="3" class="text-right font-weight-bold">Tổng tiền:</td>
+                    <td class="font-weight-bold" x-text="formatCurrency(tableData.totalPrice)"></td>
+                    <td></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        <div x-show="!tableData.tableDetails || tableData.tableDetails.length === 0" class="alert alert-info">
+            Bàn này chưa có món nào.
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div x-show="successMessage" class="alert alert-success" x-text="successMessage"></div>
+        <div x-show="actionError" class="alert alert-danger" x-text="actionError"></div>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div class="modal-overlay" x-show="showAddModal" x-transition>
+        <div class="modal-dialog-custom">
+            <div class="modal-content-custom">
+                <div class="modal-header d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="modal-title mb-0">Thêm món mới</h5>
+                    <button type="button" class="btn-close" @click="closeAddModal()">&times;</button>
                 </div>
-                <div class="modal-body" id="addItemModalContent">
+                <div class="modal-body">
+                    <form @submit.prevent="addItem()">
+                        <div class="form-group">
+                            <label>Chọn món:</label>
+                            <select x-model="addForm.foodItemId" class="form-control" required>
+                                <option value="">-- Chọn món --</option>
+                                <template x-for="item in availableFoodItems" :key="item.foodID">
+                                    <option :value="item.foodID" x-text="`${item.name} - ${formatCurrency(item.price)} (Còn: ${item.quantity})`"></option>
+                                </template>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Số lượng:</label>
+                            <input type="number" x-model="addForm.quantity" class="form-control" min="1" required>
+                        </div>
+                        <div x-show="addForm.error" class="error-message" x-text="addForm.error"></div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" :disabled="submittingAdd">
+                                <span x-show="!submittingAdd">Thêm món</span>
+                                <span x-show="submittingAdd">
+                                    <div class="loading-spinner"></div> Đang thêm...
+                                </span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" @click="closeAddModal()" :disabled="submittingAdd">Hủy</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="editItemModal" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Sửa số lượng</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    <!-- Edit Item Modal -->
+    <div class="modal-overlay" x-show="showEditModal" x-transition>
+        <div class="modal-dialog-custom">
+            <div class="modal-content-custom">
+                <div class="modal-header d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="modal-title mb-0">Sửa số lượng</h5>
+                    <button type="button" class="btn-close" @click="closeEditModal()">&times;</button>
                 </div>
-                <div class="modal-body" id="editItemModalContent">
+                <div class="modal-body">
+                    <form @submit.prevent="updateItem()">
+                        <div class="form-group">
+                            <label>Món:</label>
+                            <input type="text" :value="editForm.foodItemName" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Số lượng mới:</label>
+                            <input type="number" x-model="editForm.quantity" class="form-control" min="1" required>
+                        </div>
+                        <div x-show="editForm.error" class="error-message" x-text="editForm.error"></div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" :disabled="submittingEdit">
+                                <span x-show="!submittingEdit">Cập nhật</span>
+                                <span x-show="submittingEdit">
+                                    <div class="loading-spinner"></div> Đang cập nhật...
+                                </span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" @click="closeEditModal()" :disabled="submittingEdit">Hủy</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+function tableDetailApp() {
+    return {
+        tableData: {},
+        availableFoodItems: [],
+        loading: true,
+        error: '',
+        successMessage: '',
+        actionError: '',
+        addingItem: false,
+        editingItem: null,
+        deletingItem: null,
+        showAddModal: false,
+        showEditModal: false,
+        submittingAdd: false,
+        submittingEdit: false,
+        
+        addForm: {
+            foodItemId: '',
+            quantity: 1,
+            error: ''
+        },
+        
+        editForm: {
+            detailId: null,
+            foodItemName: '',
+            quantity: 1,
+            error: ''
+        },
 
-<script th:inline="javascript">
-    function openAddItemModal() {
-        var modal = $('#addItemModal');
-        var tableId = /*[[${table.tableID}]]*/ 0;
-        fetch('/employee/tables/' + tableId + '/add-item-form')
-            .then(response => response.text())
-            .then(data => {
-                $('#addItemModalContent').html(data);
-                modal.modal('show');
-                $('#addItemForm').on('submit', function(event) {
-                    event.preventDefault();
-                    var formData = new FormData(this);
-                    fetch('/employee/tables/' + tableId + '/add', {
-                        method: 'POST',
-                        body: formData
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                modal.modal('hide');
-                                window.location.reload();
-                            } else {
-                                alert('Vượt quá số lượng!');
-                            }
-                        });
+        async init() {
+            // Get table ID from URL
+            const pathParts = window.location.pathname.split('/');
+            const tableId = pathParts[pathParts.length - 1];
+            await this.loadTableDetails(tableId);
+        },
+
+        async loadTableDetails(tableId) {
+            try {
+                this.loading = true;
+                this.error = '';
+                const response = await axios.get(`/api/employee/tables/${tableId}`);
+                this.tableData = response.data;
+            } catch (error) {
+                console.error('Error loading table details:', error);
+                this.error = 'Không thể tải thông tin bàn. Vui lòng thử lại.';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async loadAvailableFoodItems() {
+            try {
+                this.addingItem = true;
+                const response = await axios.get(`/api/employee/tables/${this.tableData.table.tableID}/food-items`);
+                this.availableFoodItems = response.data.foodItems;
+            } catch (error) {
+                console.error('Error loading food items:', error);
+                this.actionError = 'Không thể tải danh sách món ăn.';
+            } finally {
+                this.addingItem = false;
+            }
+        },
+
+        async openAddItemModal() {
+            await this.loadAvailableFoodItems();
+            this.showAddModal = true;
+            this.addForm = { foodItemId: '', quantity: 1, error: '' };
+        },
+
+        closeAddModal() {
+            this.showAddModal = false;
+            this.addForm = { foodItemId: '', quantity: 1, error: '' };
+        },
+
+        async addItem() {
+            try {
+                this.submittingAdd = true;
+                this.addForm.error = '';
+                
+                const response = await axios.post(`/api/employee/tables/${this.tableData.table.tableID}/add`, {
+                    foodItem: { foodID: parseInt(this.addForm.foodItemId) },
+                    quantity: parseInt(this.addForm.quantity)
                 });
-            });
-    }
 
-    function closeAddItemModal() {
-        $('#addItemModal').modal('hide');
-    }
+                this.closeAddModal();
+                this.successMessage = 'Thêm món thành công!';
+                await this.loadTableDetails(this.tableData.table.tableID);
+                
+                setTimeout(() => { this.successMessage = ''; }, 3000);
+                
+            } catch (error) {
+                console.error('Error adding item:', error);
+                this.addForm.error = error.response?.data || 'Không thể thêm món. Vui lòng thử lại.';
+            } finally {
+                this.submittingAdd = false;
+            }
+        },
 
-    function openEditItemModal(detailId) {
-        var modal = $('#editItemModal');
-        fetch('/employee/tables/detail/' + detailId + '/edit-form')
-            .then(response => response.text())
-            .then(data => {
-                $('#editItemModalContent').html(data);
-                modal.modal('show');
-                $('#editItemForm').on('submit', function(event) {
-                    event.preventDefault();
-                    var formData = new FormData(this);
-                    fetch('/employee/tables/detail/' + detailId + '/update', {
-                        method: 'POST',
-                        body: formData
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                modal.modal('hide');
-                                window.location.reload();
-                            } else {
-                                alert('Vượt quá số lượng!');
-                            }
-                        });
+        async openEditItemModal(detailId) {
+            try {
+                this.editingItem = detailId;
+                const response = await axios.get(`/api/employee/tables/detail/${detailId}`);
+                const detail = response.data;
+                
+                this.editForm = {
+                    detailId: detailId,
+                    foodItemName: detail.foodItem.name,
+                    quantity: detail.quantity,
+                    error: ''
+                };
+                
+                this.showEditModal = true;
+            } catch (error) {
+                console.error('Error loading item details:', error);
+                this.actionError = 'Không thể tải thông tin món ăn.';
+            } finally {
+                this.editingItem = null;
+            }
+        },
+
+        closeEditModal() {
+            this.showEditModal = false;
+            this.editForm = { detailId: null, foodItemName: '', quantity: 1, error: '' };
+        },
+
+        async updateItem() {
+            try {
+                this.submittingEdit = true;
+                this.editForm.error = '';
+                
+                const response = await axios.put(`/api/employee/tables/detail/${this.editForm.detailId}`, {
+                    quantity: parseInt(this.editForm.quantity)
                 });
-            });
-    }
 
-    function closeEditItemModal() {
-        $('#editItemModal').modal('hide');
-    }
+                this.closeEditModal();
+                this.successMessage = 'Cập nhật số lượng thành công!';
+                await this.loadTableDetails(this.tableData.table.tableID);
+                
+                setTimeout(() => { this.successMessage = ''; }, 3000);
+                
+            } catch (error) {
+                console.error('Error updating item:', error);
+                this.editForm.error = error.response?.data || 'Không thể cập nhật món. Vui lòng thử lại.';
+            } finally {
+                this.submittingEdit = false;
+            }
+        },
 
-    function deleteItem(detailId) {
-        if (confirm('Bạn có chắc chắn muốn xóa món này?')) {
-            fetch('/employee/tables/detail/' + detailId + '/delete', {
-                method: 'DELETE'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        alert('Failed to delete item.');
-                    }
-                });
+        async deleteItem(detailId) {
+            if (!confirm('Bạn có chắc chắn muốn xóa món này?')) {
+                return;
+            }
+
+            try {
+                this.deletingItem = detailId;
+                await axios.delete(`/api/employee/tables/detail/${detailId}`);
+                
+                this.successMessage = 'Xóa món thành công!';
+                await this.loadTableDetails(this.tableData.table.tableID);
+                
+                setTimeout(() => { this.successMessage = ''; }, 3000);
+                
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                this.actionError = error.response?.data || 'Không thể xóa món. Vui lòng thử lại.';
+                
+                setTimeout(() => { this.actionError = ''; }, 5000);
+            } finally {
+                this.deletingItem = null;
+            }
+        },
+
+        formatCurrency(amount) {
+            if (!amount) return '0 vnđ';
+            return new Intl.NumberFormat('vi-VN').format(amount) + ' vnđ';
+        },
+
+        clearMessages() {
+            this.successMessage = '';
+            this.actionError = '';
         }
     }
+}
 </script>
 </body>
 </html>

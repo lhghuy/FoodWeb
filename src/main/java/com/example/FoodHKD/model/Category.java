@@ -2,6 +2,8 @@ package com.example.FoodHKD.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,11 +14,10 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "Categories")
 public class Category {
-    
-    public Category() {
-    // Constructor mặc định bắt buộc cho JPA
-    }
 
+    public Category() {
+        // Constructor mặc định bắt buộc cho JPA
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,15 +25,8 @@ public class Category {
 
     private String name;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @OneToMany(mappedBy = "category")
+    @JsonManagedReference
     private List<FoodItem> foodItems;
 
     public Integer getCategoryID() {
@@ -43,6 +37,14 @@ public class Category {
         this.categoryID = categoryID;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public List<FoodItem> getFoodItems() {
         return foodItems;
     }
@@ -50,5 +52,4 @@ public class Category {
     public void setFoodItems(List<FoodItem> foodItems) {
         this.foodItems = foodItems;
     }
-
 }

@@ -3,6 +3,8 @@ package com.example.FoodHKD.model;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -27,31 +29,17 @@ public class FoodItem {
     @JoinColumn(name = "categoryID")
     private Category category;
 
-
     @OneToMany(mappedBy = "foodItem", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonManagedReference
     private List<OrderDetail> orderDetails;
 
     @OneToMany(mappedBy = "foodItem", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonManagedReference
     private List<TableDetail> tableDetails;
 
-    public List<TableDetail> getTableDetails() {
-        return tableDetails;
-    }
-
-    public void setTableDetails(List<TableDetail> tableDetails) {
-        this.tableDetails = tableDetails;
-    }
-
     @OneToMany(mappedBy = "food")
+    @JsonManagedReference
     private List<InventoryLog> inventoryLogs;
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
 
     public Integer getFoodID() {
         return foodID;
@@ -68,6 +56,7 @@ public class FoodItem {
     public void setName(String name) {
         this.name = name;
     }
+
     public String getDescription() {
         return description;
     }
@@ -92,6 +81,14 @@ public class FoodItem {
         this.anh = anh;
     }
 
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
     public Category getCategory() {
         return category;
     }
@@ -99,13 +96,21 @@ public class FoodItem {
     public void setCategory(Category category) {
         this.category = category;
     }
-   
+
     public List<OrderDetail> getOrderDetails() {
         return orderDetails;
     }
 
     public void setOrderDetails(List<OrderDetail> orderDetails) {
         this.orderDetails = orderDetails;
+    }
+
+    public List<TableDetail> getTableDetails() {
+        return tableDetails;
+    }
+
+    public void setTableDetails(List<TableDetail> tableDetails) {
+        this.tableDetails = tableDetails;
     }
 
     public List<InventoryLog> getInventoryLogs() {
@@ -115,5 +120,4 @@ public class FoodItem {
     public void setInventoryLogs(List<InventoryLog> inventoryLogs) {
         this.inventoryLogs = inventoryLogs;
     }
-    
 }

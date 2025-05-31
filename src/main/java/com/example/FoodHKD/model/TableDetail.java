@@ -2,6 +2,7 @@ package com.example.FoodHKD.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "TableDetails")
@@ -12,6 +13,7 @@ public class TableDetail {
 
     @ManyToOne
     @JoinColumn(name = "tableID")
+    @JsonBackReference
     private TableEntity table;
 
     @ManyToOne
@@ -19,7 +21,6 @@ public class TableDetail {
     private FoodItem foodItem;
 
     private Integer quantity;
-
     private BigDecimal totalPrice;
 
     public Integer getTableDetailId() {
