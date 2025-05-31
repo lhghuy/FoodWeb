@@ -18,6 +18,7 @@ public class TableDetail {
 
     @ManyToOne
     @JoinColumn(name = "foodID")
+    // @JsonBackReference
     private FoodItem foodItem;
 
     private Integer quantity;

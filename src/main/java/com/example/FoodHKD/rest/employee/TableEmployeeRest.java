@@ -97,7 +97,7 @@ public class TableEmployeeRest {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/{tableId}/add")
+    @PostMapping(value  = "/{tableId}/add")
     public ResponseEntity<String> addTableDetail(@PathVariable Integer tableId, @RequestBody TableDetail newTableDetail) {
         Optional<TableEntity> tableOptional = tableService.getTableById(tableId);
         FoodItem foodItem = foodItemService.getFoodItemById(newTableDetail.getFoodItem().getFoodID());

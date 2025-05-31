@@ -3,6 +3,9 @@ package com.example.FoodHKD.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,42 +21,29 @@ import jakarta.persistence.Table;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer orderID;   
+    private Integer orderID;
 
     @ManyToOne
     @JoinColumn(name = "tableID")
+    @JsonBackReference
     private TableEntity table;
 
     @ManyToOne
     @JoinColumn(name = "createdBy")
+    @JsonBackReference
     private User createdBy;
 
     private LocalDateTime createdAt;
-
     private String status;
     private String fullName;
     private String phone;
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     @OneToMany(mappedBy = "order")
+    @JsonManagedReference
     private List<OrderDetail> orderDetails;
 
     @OneToOne(mappedBy = "order")
+    @JsonManagedReference
     private Invoice invoice;
 
     public Integer getOrderID() {
@@ -96,6 +86,22 @@ public class Order {
         this.status = status;
     }
 
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public List<OrderDetail> getOrderDetails() {
         return orderDetails;
     }
@@ -111,5 +117,4 @@ public class Order {
     public void setInvoice(Invoice invoice) {
         this.invoice = invoice;
     }
-    
 }

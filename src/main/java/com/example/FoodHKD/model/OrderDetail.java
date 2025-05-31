@@ -2,6 +2,9 @@ package com.example.FoodHKD.model;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,14 +22,15 @@ public class OrderDetail {
 
     @ManyToOne
     @JoinColumn(name = "orderID")
+    @JsonBackReference
     private Order order;
 
     @ManyToOne
     @JoinColumn(name = "foodID")
+    // @JsonManagedReference
     private FoodItem foodItem;
 
     private Integer quantity;
-
     private BigDecimal priceAtOrderTime;
 
     public Integer getOrderDetailID() {
@@ -49,8 +53,8 @@ public class OrderDetail {
         return foodItem;
     }
 
-    public void setFoodItem(FoodItem food) {
-        this.foodItem = food;
+    public void setFoodItem(FoodItem foodItem) {
+        this.foodItem = foodItem;
     }
 
     public Integer getQuantity() {

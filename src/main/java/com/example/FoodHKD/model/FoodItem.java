@@ -3,6 +3,8 @@ package com.example.FoodHKD.model;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
@@ -27,14 +29,17 @@ public class FoodItem {
 
     @ManyToOne
     @JoinColumn(name = "categoryID")
+    @JsonBackReference
     private Category category;
 
     @OneToMany(mappedBy = "foodItem", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @JsonManagedReference
+    // @JsonBackReference
+    @JsonIgnore
     private List<OrderDetail> orderDetails;
 
     @OneToMany(mappedBy = "foodItem", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @JsonManagedReference
+    // @JsonManagedReference
+    @JsonIgnore
     private List<TableDetail> tableDetails;
 
     @OneToMany(mappedBy = "food")
