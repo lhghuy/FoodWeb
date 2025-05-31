@@ -4,6 +4,272 @@
     <meta charset="UTF-8" />
     <title>Admin Dashboard</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}" />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js"
+      integrity="sha512-FPlUpimug7gt7Hn7swE8N2pHw/+oQMq/+R/hH/2hZ43VOQ+Kjh25rQzuLyPz7aUWKlRpI7wXbY6+U3oFPGjPOA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <style>
+      body {
+        min-height: 100vh;
+      }
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1050;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background-color: #fff;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        padding: 2rem;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      .modal-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .btn-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #999;
+      }
+
+      .btn-close:hover {
+        color: #333;
+      }
+
+      .search-container {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        align-items: center;
+      }
+
+      .search-input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 0.25rem;
+      }
+
+      .filter-select {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 0.25rem;
+        min-width: 120px;
+      }
+
+      .btn-search {
+        background-color: #28a745;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+      }
+
+      .btn-search:hover {
+        background-color: #218838;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .btn-view,
+      .btn-status,
+      .btn-delete {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 0.25rem;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .btn-view {
+        background-color: #007bff;
+        color: white;
+      }
+
+      .btn-view:hover {
+        background-color: #0056b3;
+        color: white;
+      }
+
+      .btn-status {
+        background-color: #ffc107;
+        color: #212529;
+      }
+
+      .btn-status:hover {
+        background-color: #e0a800;
+      }
+
+      .btn-delete {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .btn-delete:hover {
+        background-color: #c82333;
+      }
+
+      .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .status-pending {
+        background-color: #ffc107;
+        color: #212529;
+      }
+
+      .status-preparing {
+        background-color: #17a2b8;
+        color: white;
+      }
+
+      .status-ready {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .status-served {
+        background-color: #6c757d;
+        color: white;
+      }
+
+      .status-cancelled {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .order-info {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+      }
+
+      .order-info p {
+        margin: 0.5rem 0;
+      }
+
+      .order-details-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+
+      .order-details-table th,
+      .order-details-table td {
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      .order-details-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+      }
+
+      .total-row {
+        font-weight: 600;
+        background-color: #e9ecef;
+      }
+
+      .status-controls {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+      }
+
+      .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background-color: #0056b3;
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background-color: #545b62;
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -18,7 +284,15 @@
       </ul>
     </div>
 
-    <div class="main-content">
+    <div class="main-content" x-data="orderManagement()">
+      <!-- Alert Messages -->
+      <div
+        x-show="alertMessage.show"
+        :class="alertMessage.type === 'success' ? 'alert alert-success' : 'alert alert-danger'"
+        x-text="alertMessage.text"
+        x-transition.opacity
+      ></div>
+
       <div class="header">
         <h1>Quản Lý Hóa Đơn</h1>
         <div class="user-info">
@@ -32,39 +306,422 @@
       <div class="card">
         <h2>Danh sách Hóa đơn</h2>
 
-        <table class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Khách hàng</th>
-              <th>Ngày tạo</th>
-              <th>Bàn</th>
-              <th>Nhân viên</th>
-              <th>Tác Vụ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="order : ${orders}">
-              <td th:text="${order.orderID}">1</td>
-              <td th:text="${order.fullName}">Khách</td>
-              <td
-                th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"
+        <!-- Loading indicator -->
+        <div x-show="loading" class="text-center" style="padding: 20px">
+          <p>Đang tải dữ liệu...</p>
+        </div>
+
+        <!-- Error message -->
+        <div x-show="error" class="alert alert-danger" x-text="error"></div>
+
+        <!-- Orders Table -->
+        <div x-show="!loading && !error">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Khách hàng</th>
+                <th>Ngày tạo</th>
+                <th>Bàn</th>
+                <th>Nhân viên</th>
+                <th>Trạng thái</th>
+                <th>Tổng tiền</th>
+                <th>Tác Vụ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template
+                x-for="(order, index) in filteredOrders"
+                :key="order.orderID"
               >
-                01/01/2024
-              </td>
-              <td th:text="${order.table.tableNumber}">B01</td>
-              <td th:text="${order.createdBy.fullName}">Nhân viên</td>
-              <td>
-                <button class="xem">
-                  <a th:href="@{/admin/orders/{id}(id=${order.orderID})}"
-                    >Xem</a
-                  >
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <tr>
+                  <td x-text="order.orderID"></td>
+                  <td x-text="order.fullName || 'N/A'"></td>
+                  <td x-text="formatDateTime(order.createdAt)"></td>
+                  <td x-text="order.table?.tableNumber || 'N/A'"></td>
+                  <td x-text="order.createdBy?.fullName || 'N/A'"></td>
+                  <td>
+                    <span
+                      class="status-badge"
+                      :class="`status-${(order.status || 'pending').toLowerCase()}`"
+                      x-text="order.status"
+                    ></span>
+                  </td>
+                  <td x-text="formatCurrency(order.total)"></td>
+                  <td class="action-buttons">
+                    <button
+                      class="btn-view"
+                      @click="viewOrderDetails(order.orderID)"
+                    >
+                      Xem
+                    </button>
+
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+
+          <!-- Empty state -->
+          <div
+            x-show="filteredOrders.length === 0"
+            class="text-center"
+            style="padding: 20px"
+          >
+            <p>Không tìm thấy hóa đơn nào.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Details Modal -->
+      <div class="modal-overlay" x-show="showDetailsModal" x-transition>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              Chi tiết hóa đơn #<span x-text="selectedOrder?.orderID"></span>
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="closeDetailsModal()"
+            >
+              &times;
+            </button>
+          </div>
+
+          <div x-show="selectedOrder">
+            <!-- Order Information -->
+            <div class="order-info">
+              <p>
+                <strong>Khách hàng:</strong>
+                <span x-text="selectedOrder?.fullName || 'N/A'"></span>
+              </p>
+              <p>
+                <strong>SĐT:</strong>
+                <span x-text="selectedOrder?.phone || 'N/A'"></span>
+              </p>
+              <p>
+                <strong>Bàn:</strong>
+                <span
+                  x-text="selectedOrder?.table?.tableNumber || 'N/A'"
+                ></span>
+              </p>
+              <p>
+                <strong>Nhân viên:</strong>
+                <span
+                  x-text="selectedOrder?.createdBy?.fullName || 'N/A'"
+                ></span>
+              </p>
+              <p>
+                <strong>Thời gian:</strong>
+                <span x-text="formatDateTime(selectedOrder?.createdAt)"></span>
+              </p>
+              <p>
+                <strong>Trạng thái:</strong>
+                <span
+                  class="status-badge"
+                  :class="`status-${(selectedOrder?.status || 'pending').toLowerCase()}`"
+                  x-text="selectedOrder?.status"
+                ></span>
+              </p>
+            </div>
+
+            <!-- Order Details Table -->
+            <table class="order-details-table">
+              <thead>
+                <tr>
+                  <th>Tên món</th>
+                  <th>Số lượng</th>
+                  <th>Đơn giá</th>
+                  <th>Thành tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template
+                  x-for="item in orderDetails"
+                  :key="item.orderDetailID"
+                >
+                  <tr>
+                    <td x-text="item.foodItem?.name || 'N/A'"></td>
+                    <td x-text="item.quantity"></td>
+                    <td x-text="formatCurrency(item.priceAtOrderTime)"></td>
+                    <td
+                      x-text="formatCurrency(item.priceAtOrderTime * item.quantity)"
+                    ></td>
+                  </tr>
+                </template>
+                <tr class="total-row">
+                  <td colspan="3"><strong>Tổng tiền:</strong></td>
+                  <td>
+                    <strong
+                      x-text="formatCurrency(calculateTotal(orderDetails))"
+                    ></strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Status Update Controls -->
+            <div
+              class="status-controls"
+              x-show="selectedOrder?.status !== 'Served' && selectedOrder?.status !== 'Cancelled'"
+            >
+              <label for="newStatus">Cập nhật trạng thái:</label>
+              <select id="newStatus" x-model="newStatus" class="filter-select">
+                <template x-for="status in availableStatuses" :key="status">
+                  <option :value="status" x-text="status"></option>
+                </template>
+              </select>
+              <button
+                class="btn-primary"
+                @click="updateOrderStatus()"
+                :disabled="updatingStatus"
+                style="margin-left: 0.5rem"
+              >
+                <span x-show="!updatingStatus">Cập nhật</span>
+                <span x-show="updatingStatus">
+                  <div class="loading-spinner"></div>
+                  Đang cập nhật...
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-top: 1rem">
+            <button
+              type="button"
+              class="btn-secondary"
+              @click="closeDetailsModal()"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
       </div>
     </div>
+
+    <script>
+      function orderManagement() {
+        return {
+          orders: [],
+          filteredOrders: [],
+          availableStatuses: [],
+          loading: true,
+          error: null,
+          selectedStatus: "",
+          showDetailsModal: false,
+          selectedOrder: null,
+          orderDetails: [],
+          newStatus: "",
+          updatingStatus: false,
+          alertMessage: {
+            show: false,
+            type: "",
+            text: "",
+          },
+
+          async init() {
+            await Promise.all([this.loadOrders(), this.loadStatuses()]);
+          },
+
+          async loadOrders() {
+            try {
+              this.loading = true;
+              this.error = null;
+
+              const response = await axios.get("/api/admin/orders");
+
+              if (response.data.success) {
+                this.orders = response.data.data;
+                this.filteredOrders = [...this.orders];
+              } else {
+                this.error =
+                  response.data.message || "Không thể tải danh sách hóa đơn";
+              }
+            } catch (error) {
+              console.error("Error loading orders:", error);
+              this.error = "Lỗi kết nối. Vui lòng thử lại sau.";
+            } finally {
+              this.loading = false;
+            }
+          },
+
+          async loadStatuses() {
+            try {
+              const response = await axios.get("/api/admin/orders/statuses");
+              if (response.data.success) {
+                this.availableStatuses = response.data.data;
+              }
+            } catch (error) {
+              console.error("Error loading statuses:", error);
+            }
+          },
+
+          async filterByStatus() {
+            if (!this.selectedStatus) {
+              this.filteredOrders = [...this.orders];
+              return;
+            }
+
+            try {
+              const response = await axios.get(
+                `/api/admin/orders/status/${this.selectedStatus}`
+              );
+              if (response.data.success) {
+                this.filteredOrders = response.data.data;
+              }
+            } catch (error) {
+              console.error("Error filtering by status:", error);
+            }
+          },
+
+          clearFilters() {
+            this.selectedStatus = "";
+            this.filteredOrders = [...this.orders];
+          },
+
+          async viewOrderDetails(orderId) {
+            try {
+              const response = await axios.get(
+                `/api/admin/orders/${orderId}/details`
+              );
+
+              if (response.data.success) {
+                this.selectedOrder = response.data.data.order;
+                this.orderDetails = response.data.data.orderDetails;
+                this.newStatus = this.selectedOrder.status;
+                this.showDetailsModal = true;
+              } else {
+                this.showAlert("error", "Không thể tải chi tiết hóa đơn");
+              }
+            } catch (error) {
+              console.error("Error loading order details:", error);
+              this.showAlert("error", "Lỗi kết nối. Vui lòng thử lại sau.");
+            }
+          },
+
+          closeDetailsModal() {
+            this.showDetailsModal = false;
+            this.selectedOrder = null;
+            this.orderDetails = [];
+            this.newStatus = "";
+          },
+
+          async updateOrderStatus() {
+            if (this.updatingStatus || !this.newStatus || !this.selectedOrder)
+              return;
+
+            try {
+              this.updatingStatus = true;
+
+              const response = await axios.patch(
+                `/api/admin/orders/${this.selectedOrder.orderID}/status`,
+                { status: this.newStatus }
+              );
+
+              if (response.data.success) {
+                this.selectedOrder.status = this.newStatus;
+                // Update in the main orders list
+                const orderIndex = this.orders.findIndex(
+                  (o) => o.orderID === this.selectedOrder.orderID
+                );
+                if (orderIndex !== -1) {
+                  this.orders[orderIndex].status = this.newStatus;
+                }
+                // Update in filtered list
+                const filteredIndex = this.filteredOrders.findIndex(
+                  (o) => o.orderID === this.selectedOrder.orderID
+                );
+                if (filteredIndex !== -1) {
+                  this.filteredOrders[filteredIndex].status = this.newStatus;
+                }
+                this.showAlert("success", "Cập nhật trạng thái thành công!");
+              } else {
+                this.showAlert(
+                  "error",
+                  response.data.message || "Không thể cập nhật trạng thái"
+                );
+              }
+            } catch (error) {
+              console.error("Error updating status:", error);
+              this.showAlert("error", "Lỗi kết nối. Vui lòng thử lại sau.");
+            } finally {
+              this.updatingStatus = false;
+            }
+          },
+
+          async deleteOrder(orderId, orderDisplayId) {
+            if (
+              !confirm(`Bạn có chắc chắn muốn xóa hóa đơn #${orderDisplayId}?`)
+            ) {
+              return;
+            }
+
+            try {
+              const response = await axios.delete(
+                `/api/admin/orders/${orderId}`
+              );
+
+              if (response.data.success) {
+                this.orders = this.orders.filter((o) => o.orderID !== orderId);
+                this.filteredOrders = this.filteredOrders.filter(
+                  (o) => o.orderID !== orderId
+                );
+                this.showAlert("success", "Xóa hóa đơn thành công!");
+              } else {
+                this.showAlert(
+                  "error",
+                  response.data.message || "Không thể xóa hóa đơn"
+                );
+              }
+            } catch (error) {
+              console.error("Error deleting order:", error);
+              this.showAlert("error", "Lỗi kết nối. Vui lòng thử lại sau.");
+            }
+          },
+
+          formatDateTime(dateTime) {
+            if (!dateTime) return "N/A";
+            try {
+              const date = new Date(dateTime);
+              return date.toLocaleString("vi-VN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+            } catch (error) {
+              return dateTime;
+            }
+          },
+          calculateTotal(orderDetails) {
+            return orderDetails.reduce((total, item) => {
+              return total + item.priceAtOrderTime * item.quantity;
+            }, 0);
+          },
+          formatCurrency(amount) {
+            if (amount == null) return "0 đ";
+            try {
+              return new Intl.NumberFormat("vi-VN").format(amount) + " đ";
+            } catch (error) {
+              return amount + " đ";
+            }
+          },
+
+          showAlert(type, text) {
+            this.alertMessage = {
+              show: true,
+              type: type,
+              text: text,
+            };
+
+            setTimeout(() => {
+              this.alertMessage.show = false;
+            }, 3000);
+          },
+        };
+      }
+    </script>
   </body>
 </html>

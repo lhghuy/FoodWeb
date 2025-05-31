@@ -20,10 +20,8 @@ public class UserAdminController {
 
     @GetMapping
     public String getAllUsers(Model model, Principal principal) {
-        List<User> users = userService.getAllUsers();
         User loggedInUser = userService.getUserByUsername(principal.getName());
 
-        model.addAttribute("users", users);
         model.addAttribute("loggedInUser", loggedInUser);
         model.addAttribute("pageTitle", "Quản lý Nhân viên");
         return "usermanagement";
