@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
@@ -25,12 +26,12 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "tableID")
-    @JsonBackReference
+    @JsonIgnore
+
     private TableEntity table;
 
     @ManyToOne
     @JoinColumn(name = "createdBy")
-    @JsonBackReference
     private User createdBy;
 
     private LocalDateTime createdAt;
@@ -39,11 +40,9 @@ public class Order {
     private String phone;
 
     @OneToMany(mappedBy = "order")
-    @JsonManagedReference
     private List<OrderDetail> orderDetails;
 
     @OneToOne(mappedBy = "order")
-    @JsonManagedReference
     private Invoice invoice;
 
     public Integer getOrderID() {

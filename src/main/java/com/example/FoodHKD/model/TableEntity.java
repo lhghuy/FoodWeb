@@ -19,15 +19,12 @@ public class TableEntity {
 
     @ManyToOne
     @JoinColumn(name = "employeeId")
-    @JsonBackReference
     private User employee;
 
     @OneToMany(mappedBy = "table")
-    @JsonManagedReference
     private List<TableDetail> tableDetails;
 
     @OneToMany(mappedBy = "table")
-    @JsonManagedReference
     private List<Order> orders;
 
     public Integer getTableID() {

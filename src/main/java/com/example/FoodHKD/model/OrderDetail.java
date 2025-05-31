@@ -3,6 +3,7 @@ package com.example.FoodHKD.model;
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
@@ -22,12 +23,12 @@ public class OrderDetail {
 
     @ManyToOne
     @JoinColumn(name = "orderID")
-    @JsonBackReference
+    @JsonIgnore
+
     private Order order;
 
     @ManyToOne
     @JoinColumn(name = "foodID")
-    // @JsonManagedReference
     private FoodItem foodItem;
 
     private Integer quantity;

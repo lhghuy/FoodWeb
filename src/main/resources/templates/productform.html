@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js" integrity="sha512-FPlUpimug7gt7Hn7swE8N2pHw/+oQMq/+R/hH/2hZ43VOQ+Kjh25rQzuLyPz7aUWKlRpI7wXbY6+U3oFPGjPOA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <body>
 <div class="sidebar">
     <h2>ADMIN</h2>
@@ -16,9 +19,15 @@
     </ul>
 </div>
 
-<div class="main-content">
+<div class="main-content" x-data="productForm()">
+    <!-- Alert Messages -->
+    <div x-show="alertMessage.show" 
+         :class="alertMessage.type === 'success' ? 'alert alert-success' : 'alert alert-danger'"
+         x-text="alertMessage.text"
+         x-transition.opacity></div>
+
     <div class="header">
-        <h1>Sửa Món Ăn</h1>
+        <h1 x-text="isEditMode ? 'Sửa Món Ăn' : 'Thêm Món Ăn'">Sửa Món Ăn</h1>
         <div class="user-info">
             <form th:action="@{/logout}" method="post" style="display:inline;">
                 <button type="submit" class="btn-logout">Đăng xuất</button>
@@ -28,53 +37,252 @@
     </div>
 
     <div class="card">
+        <!-- Loading indicator -->
+        <div x-show="loading" class="text-center" style="padding: 20px;">
+            <p>Đang tải dữ liệu...</p>
+        </div>
 
-        <h3 th:text="${foodItem.foodID == null ? 'Thêm sản phẩm mới' : 'Sửa sản phẩm'}"></h3>
+        <!-- Error message -->
+        <div x-show="error && !loading" class="alert alert-danger" x-text="error"></div>
 
-        <form th:action="${foodItem.foodID == null ? '/admin/foods/add' : '/admin/foods/edit/' + foodItem.foodID}" th:object="${foodItem}" method="post">
-            <div class="form-group">
-                <label for="name">Tên sản phẩm:</label>
-                <input type="text" id="name" th:field="*{name}" required>
-            </div>
+        <!-- Form -->
+        <div x-show="!loading && !error">
+            <h3 x-text="isEditMode ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới'"></h3>
 
-            <div class="form-group">
-                <label for="description">Mô tả:</label>
-                <textarea id="description" th:field="*{description}" rows="4"></textarea>
-            </div>
+            <form @submit.prevent="submitForm">
+                <div class="form-group">
+                    <label for="name">Tên sản phẩm:</label>
+                    <input type="text" 
+                           id="name" 
+                           x-model="formData.name" 
+                           required
+                           :class="{'error': validationErrors.name}">
+                    <div x-show="validationErrors.name" 
+                         x-text="validationErrors.name" 
+                         class="text-danger" 
+                         style="font-size: 0.9em;"></div>
+                </div>
 
-           <div class="form-group" style="position: relative;">
-                <label for="price">Giá:</label>
-                <input type="number" th:field="*{price}" step="0.01" min="0" required style="padding-right: 50px;" />
-                <span style="position: absolute; right: 10px; top: 32px; color: #666;">VND</span>
-                <div style="font-size: 0.85em; color: #888; margin-top: 4px;">Ví dụ: 100000 → 100,000VND</div>
-                <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger" style="font-size: 0.9em;"></div>
-            </div>
+                <div class="form-group">
+                    <label for="description">Mô tả:</label>
+                    <textarea id="description" 
+                              x-model="formData.description" 
+                              rows="4"
+                              :class="{'error': validationErrors.description}"></textarea>
+                    <div x-show="validationErrors.description" 
+                         x-text="validationErrors.description" 
+                         class="text-danger" 
+                         style="font-size: 0.9em;"></div>
+                </div>
 
-            <div class="form-group">
-                <label for="anh">URL Ảnh:</label>
-                <input type="text" id="anh" th:field="*{anh}">
-            </div>
+                <div class="form-group" style="position: relative;">
+                    <label for="price">Giá:</label>
+                    <input type="number" 
+                           id="price"
+                           x-model="formData.price" 
+                           step="0.01" 
+                           min="0" 
+                           required 
+                           style="padding-right: 50px;"
+                           :class="{'error': validationErrors.price}" />
+                    <span style="position: absolute; right: 10px; top: 32px; color: #666;">VND</span>
+                    <div style="font-size: 0.85em; color: #888; margin-top: 4px;">Ví dụ: 100000 → 100,000VND</div>
+                    <div x-show="validationErrors.price" 
+                         x-text="validationErrors.price" 
+                         class="text-danger" 
+                         style="font-size: 0.9em;"></div>
+                </div>
 
-            <div class="form-group">
-                <label for="quantity">Số lượng:</label>
-                <input type="number" id="quantity" th:field="*{quantity}" min="1" step="1" required />
-                <div th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}" class="text-danger" style="font-size: 0.9em;"></div>
-            </div>
+                <div class="form-group">
+                    <label for="anh">URL Ảnh:</label>
+                    <input type="text" 
+                           id="anh" 
+                           x-model="formData.anh"
+                           :class="{'error': validationErrors.anh}">
+                    <div x-show="validationErrors.anh" 
+                         x-text="validationErrors.anh" 
+                         class="text-danger" 
+                         style="font-size: 0.9em;"></div>
+                </div>
 
+                <div class="form-group">
+                    <label for="quantity">Số lượng:</label>
+                    <input type="number" 
+                           id="quantity" 
+                           x-model="formData.quantity" 
+                           min="1" 
+                           step="1" 
+                           required 
+                           :class="{'error': validationErrors.quantity}" />
+                    <div x-show="validationErrors.quantity" 
+                         x-text="validationErrors.quantity" 
+                         class="text-danger" 
+                         style="font-size: 0.9em;"></div>
+                </div>
 
-            <div class="form-group">
-                <label for="category">Danh mục:</label>
-                <select id="category" th:field="*{category.categoryID}">
-                    <option th:each="cat : ${categories}" th:value="${cat.categoryID}" th:text="${cat.name}"></option>
-                </select>
-            </div>
+                <div class="form-group">
+                    <label for="category">Danh mục:</label>
+                    <select id="category" 
+                            x-model="formData.categoryId"
+                            required
+                            :class="{'error': validationErrors.categoryId}">
+                        <option value="">Chọn danh mục</option>
+                        <template x-for="category in categories" :key="category.categoryID">
+                            <option :value="category.categoryID" x-text="category.name"></option>
+                        </template>
+                    </select>
+                    <div x-show="validationErrors.categoryId" 
+                         x-text="validationErrors.categoryId" 
+                         class="text-danger" 
+                         style="font-size: 0.9em;"></div>
+                </div>
 
-            <div class="form-actions">
-                <a th:href="@{/admin/foods}" class="cancel-button">Hủy</a>
-                <button type="submit" th:text="${foodItem.foodID == null ? 'Thêm sản phẩm' : 'Cập nhật'}"></button>
-            </div>
-        </form>
+                <div class="form-actions">
+                    <a th:href="@{/admin/foods}" class="cancel-button">Hủy</a>
+                    <button type="submit" 
+                            :disabled="submitting"
+                            x-text="submitting ? 'Đang xử lý...' : (isEditMode ? 'Cập nhật' : 'Thêm sản phẩm')"></button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+
+    <script>
+        function productForm() {
+            return {
+                isEditMode: false,
+                productId: null,
+                loading: true,
+                error: null,
+                submitting: false,
+                categories: [],
+                formData: {
+                    name: '',
+                    description: '',
+                    price: '',
+                    anh: '',
+                    quantity: '',
+                    categoryId: ''
+                },
+                validationErrors: {},
+                alertMessage: {
+                    show: false,
+                    type: '',
+                    text: ''
+                },
+
+                async init() {
+                    // Check if we're in edit mode based on URL
+                    const pathParts = window.location.pathname.split('/');
+                    if (pathParts.includes('edit') && pathParts[pathParts.length - 1] !== 'edit') {
+                        this.isEditMode = true;
+                        this.productId = pathParts[pathParts.length - 1];
+                    }
+
+                    await this.loadData();
+                },
+
+                async loadData() {
+                    try {
+                        this.loading = true;
+                        this.error = null;
+
+                        // Load categories
+                        const categoriesResponse = await axios.get('/api/admin/foods/categories');
+                        if (categoriesResponse.data.success) {
+                            this.categories = categoriesResponse.data.data;
+                        }
+
+                        // If edit mode, load product data
+                        if (this.isEditMode && this.productId) {
+                            const productResponse = await axios.get(`/api/admin/foods/${this.productId}`);
+                            if (productResponse.data.success) {
+                                const product = productResponse.data.data;
+                                this.formData = {
+                                    name: product.name || '',
+                                    description: product.description || '',
+                                    price: product.price || '',
+                                    anh: product.anh || '',
+                                    quantity: product.quantity || '',
+                                    categoryId: product.category?.categoryID || ''
+                                };
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error loading data:', error);
+                        this.error = 'Lỗi kết nối. Vui lòng thử lại sau.';
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async submitForm() {
+                    if (this.submitting) return;
+
+                    try {
+                        this.submitting = true;
+                        this.validationErrors = {};
+
+                        // Prepare data for API
+                        const apiData = {
+                            name: this.formData.name,
+                            description: this.formData.description,
+                            price: parseFloat(this.formData.price),
+                            anh: this.formData.anh,
+                            quantity: parseInt(this.formData.quantity),
+                            category: {
+                                categoryID: parseInt(this.formData.categoryId)
+                            }
+                        };
+
+                        let response;
+                        if (this.isEditMode) {
+                            response = await axios.put(`/api/admin/foods/${this.productId}`, apiData);
+                        } else {
+                            response = await axios.post('/api/admin/foods', apiData);
+                        }
+
+                        if (response.data.success) {
+                            this.showAlert('success', response.data.message);
+                            // Redirect after success
+                            setTimeout(() => {
+                                window.location.href = '/admin/foods';
+                            }, 1500);
+                        } else {
+                            this.handleApiErrors(response.data);
+                        }
+                    } catch (error) {
+                        console.error('Error submitting form:', error);
+                        if (error.response?.data?.errors) {
+                            this.validationErrors = error.response.data.errors;
+                        }
+                        this.showAlert('error', error.response?.data?.message || 'Lỗi kết nối. Vui lòng thử lại sau.');
+                    } finally {
+                        this.submitting = false;
+                    }
+                },
+
+                handleApiErrors(data) {
+                    if (data.errors) {
+                        this.validationErrors = data.errors;
+                    }
+                    this.showAlert('error', data.message || 'Có lỗi xảy ra khi xử lý dữ liệu');
+                },
+
+                showAlert(type, text) {
+                    this.alertMessage = {
+                        show: true,
+                        type: type,
+                        text: text
+                    };
+
+                    // Hide alert after 3 seconds
+                    setTimeout(() => {
+                        this.alertMessage.show = false;
+                    }, 3000);
+                }
+            }
+        }
+    </script>
 </body>
 </html>

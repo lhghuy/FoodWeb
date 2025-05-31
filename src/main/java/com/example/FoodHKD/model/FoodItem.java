@@ -29,21 +29,19 @@ public class FoodItem {
 
     @ManyToOne
     @JoinColumn(name = "categoryID")
-    @JsonBackReference
     private Category category;
 
     @OneToMany(mappedBy = "foodItem", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    // @JsonBackReference
     @JsonIgnore
     private List<OrderDetail> orderDetails;
 
     @OneToMany(mappedBy = "foodItem", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    // @JsonManagedReference
     @JsonIgnore
     private List<TableDetail> tableDetails;
 
     @OneToMany(mappedBy = "food")
-    @JsonManagedReference
+    @JsonIgnore
+
     private List<InventoryLog> inventoryLogs;
 
     public Integer getFoodID() {

@@ -36,21 +36,25 @@ public class User {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "createdBy")
-    @JsonManagedReference
+    @JsonIgnore
+
     private List<Order> orders;
 
     @OneToMany(mappedBy = "issuedBy")
-    @JsonManagedReference 
+    @JsonIgnore
+
     private List<Invoice> invoices;
 
     @OneToMany(mappedBy = "employee")
-    @JsonManagedReference
+    @JsonIgnore
+
     private List<TableEntity> tableEntities;
 
 
 
     @OneToMany(mappedBy = "createdBy")
-    @JsonManagedReference
+    @JsonIgnore
+
     private List<InventoryLog> inventoryLogs;
 
     public String getAvatar() {

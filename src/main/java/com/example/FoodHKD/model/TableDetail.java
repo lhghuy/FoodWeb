@@ -1,5 +1,6 @@
 package com.example.FoodHKD.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -13,12 +14,12 @@ public class TableDetail {
 
     @ManyToOne
     @JoinColumn(name = "tableID")
-    @JsonBackReference
+    @JsonIgnore
+
     private TableEntity table;
 
     @ManyToOne
     @JoinColumn(name = "foodID")
-    // @JsonBackReference
     private FoodItem foodItem;
 
     private Integer quantity;

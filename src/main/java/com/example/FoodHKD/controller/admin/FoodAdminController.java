@@ -31,15 +31,11 @@ public class FoodAdminController {
 
     @GetMapping
     public String getAll(Model model) {
-        List<FoodItem> foodItems = foodItemService.getAllFoodItems();
-        model.addAttribute("products", foodItems);
         return "productmanagement";
     }
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
-        model.addAttribute("foodItem", new FoodItem());
-        model.addAttribute("categories", categoryService.getAllCategories());
         return "productform";
     }
 
@@ -48,7 +44,6 @@ public class FoodAdminController {
                           BindingResult result,
                           Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("categories", categoryService.getAllCategories()); 
             return "productform";
         }
         foodItemService.createFoodItem(foodItem);
@@ -58,9 +53,6 @@ public class FoodAdminController {
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") Integer id, Model model) {
-        FoodItem foodItem = foodItemService.getFoodItemById(id);
-        model.addAttribute("foodItem", foodItem);
-        model.addAttribute("categories", categoryService.getAllCategories());
         return "productform";
     }
 
@@ -70,7 +62,6 @@ public class FoodAdminController {
                              BindingResult result,
                              Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("categories", categoryService.getAllCategories());
             return "productform";
         }
         foodItemService.updateFoodItem(id, foodItem);
