@@ -1,727 +1,429 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8"/>
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" th:href="@{/css/admin.css}" />
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js"
-      integrity="sha512-FPlUpimug7gt7Hn7swE8N2pHw/+oQMq/+R/hH/2hZ43VOQ+Kjh25rQzuLyPz7aUWKlRpI7wXbY6+U3oFPGjPOA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
+    <link rel="stylesheet" th:href="@{/css/admin.css}"/>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js"
+            integrity="sha512-FPlUpimug7gt7Hn7swE8N2pHw/+oQMq/+R/hH/2hZ43VOQ+Kjh25rQzuLyPz7aUWKlRpI7wXbY6+U3oFPGjPOA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css"
+          rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT"
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+            crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
-      body {
-        min-height: 100vh;
-      }
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1050;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .modal-content {
-        background-color: #fff;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        padding: 2rem;
-        width: 90%;
-        max-width: 800px;
-        max-height: 90vh;
-        overflow-y: auto;
-      }
-
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #eee;
-      }
-
-      .modal-title {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 600;
-      }
-
-      .btn-close {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #999;
-      }
-
-      .btn-close:hover {
-        color: #333;
-      }
-
-      .search-container {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        align-items: center;
-      }
-
-      .search-input {
-        flex: 1;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-      }
-
-      .filter-select {
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-        min-width: 120px;
-      }
-
-      .btn-search {
-        background-color: #28a745;
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-      }
-
-      .btn-search:hover {
-        background-color: #218838;
-      }
-
-      .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-      }
-
-      .btn-view,
-      .btn-status,
-      .btn-delete {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        border-radius: 0.25rem;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-      }
-
-      .btn-view {
-        background-color: #007bff;
-        color: white;
-      }
-
-      .btn-view:hover {
-        background-color: #0056b3;
-        color: white;
-      }
-
-      .btn-status {
-        background-color: #ffc107;
-        color: #212529;
-      }
-
-      .btn-status:hover {
-        background-color: #e0a800;
-      }
-
-      .btn-delete {
-        background-color: #dc3545;
-        color: white;
-      }
-
-      .btn-delete:hover {
-        background-color: #c82333;
-      }
-
-      .status-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      .status-pending {
-        background-color: #ffc107;
-        color: #212529;
-      }
-
-      .status-preparing {
-        background-color: #17a2b8;
-        color: white;
-      }
-
-      .status-ready {
-        background-color: #28a745;
-        color: white;
-      }
-
-      .status-served {
-        background-color: #6c757d;
-        color: white;
-      }
-
-      .status-cancelled {
-        background-color: #dc3545;
-        color: white;
-      }
-
-      .order-info {
-        margin-bottom: 1rem;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 0.25rem;
-      }
-
-      .order-info p {
-        margin: 0.5rem 0;
-      }
-
-      .order-details-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-      }
-
-      .order-details-table th,
-      .order-details-table td {
-        padding: 0.75rem;
-        border: 1px solid #ddd;
-        text-align: left;
-      }
-
-      .order-details-table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-      }
-
-      .total-row {
-        font-weight: 600;
-        background-color: #e9ecef;
-      }
-
-      .status-controls {
-        margin-top: 1rem;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 0.25rem;
-      }
-
-      .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-      }
-
-      .btn-primary:hover:not(:disabled) {
-        background-color: #0056b3;
-      }
-
-      .btn-primary:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-
-      .btn-secondary {
-        background-color: #6c757d;
-        border-color: #6c757d;
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-      }
-
-      .btn-secondary:hover:not(:disabled) {
-        background-color: #545b62;
-      }
-
-      .loading-spinner {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: #fff;
-        animation: spin 1s ease-in-out infinite;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
+    
     </style>
-  </head>
+</head>
 
-  <body>
-    <div class="sidebar">
-      <h2>ADMIN</h2>
-      <ul>
-        <li><a th:href="@{/admin}">Dashboard</a></li>
-        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
-        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
-        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
-        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
-      </ul>
+<body>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2><i class="bi bi-shield-check"></i> ADMIN</h2>
     </div>
+    <nav class="sidebar-nav">
+        <ul>
+            <li><a th:href="@{/admin}"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
+            <li><a th:href="@{/admin/foods}"><i class="bi bi-cup-hot"></i>Quản lý sản phẩm</a></li>
+            <li><a th:href="@{/admin/tables}"><i class="bi bi-table"></i>Quản lý bàn</a></li>
+            <li><a th:href="@{/admin/users}"><i class="bi bi-people"></i>Quản lý nhân viên</a></li>
+            <li><a th:href="@{/admin/orders}" class="active"><i class="bi bi-receipt"></i>Quản lý hoá đơn</a></li>
+        </ul>
+    </nav>
+</div>
 
-    <div class="main-content" x-data="orderManagement()">
-      <!-- Alert Messages -->
-      <div
-        x-show="alertMessage.show"
-        :class="alertMessage.type === 'success' ? 'alert alert-success' : 'alert alert-danger'"
-        x-text="alertMessage.text"
-        x-transition.opacity
-      ></div>
-
-      <div class="header">
-        <h1>Quản Lý Hóa Đơn</h1>
-        <div class="user-info">
-          <form th:action="@{/logout}" method="post" style="display: inline">
-            <button type="submit" class="btn-logout">Đăng xuất</button>
-          </form>
-          <span th:text="${loggedInUser}">Admin</span>
+<div class="main-content" x-data="orderManagement()">
+    <nav class="top-navbar">
+        <h1 class="page-title"><i class="bi bi-receipt me-2"></i>Quản Lý Hóa Đơn</h1>
+        <div class="user-actions">
+            <div class="user-info">
+                <i class="bi bi-person-circle"></i>
+                <span th:text="${loggedInUser}">Admin</span>
+            </div>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-box-arrow-right me-1"></i>Đăng xuất
+                </button>
+            </form>
         </div>
-      </div>
+    </nav>
 
-      <div class="card">
-        <h2>Danh sách Hóa đơn</h2>
-
-        <!-- Loading indicator -->
-        <div x-show="loading" class="text-center" style="padding: 20px">
-          <p>Đang tải dữ liệu...</p>
+    <div class="content-wrapper">
+        <div class="alert alert-dismissible fade show"
+             :class="alertMessage.type === 'success' ? 'alert-success' : 'alert-danger'"
+             x-show="alertMessage.show" x-transition>
+            <i class="bi" :class="alertMessage.type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle'"></i>
+            <span x-text="alertMessage.text"></span>
+            <button type="button" class="btn-close" @click="alertMessage.show = false"></button>
         </div>
 
-        <!-- Error message -->
-        <div x-show="error" class="alert alert-danger" x-text="error"></div>
-
-        <!-- Orders Table -->
-        <div x-show="!loading && !error">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Khách hàng</th>
-                <th>Ngày tạo</th>
-                <th>Bàn</th>
-                <th>Nhân viên</th>
-                <th>Trạng thái</th>
-                <th>Tổng tiền</th>
-                <th>Tác Vụ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template
-                x-for="(order, index) in filteredOrders"
-                :key="order.orderID"
-              >
-                <tr>
-                  <td x-text="order.orderID"></td>
-                  <td x-text="order.fullName || 'N/A'"></td>
-                  <td x-text="formatDateTime(order.createdAt)"></td>
-                  <td x-text="order.table?.tableNumber || 'N/A'"></td>
-                  <td x-text="order.createdBy?.fullName || 'N/A'"></td>
-                  <td>
-                    <span
-                      class="status-badge"
-                      :class="`status-${(order.status || 'pending').toLowerCase()}`"
-                      x-text="order.status"
-                    ></span>
-                  </td>
-                  <td x-text="formatCurrency(order.total)"></td>
-                  <td class="action-buttons">
-                    <button
-                      class="btn-view"
-                      @click="viewOrderDetails(order.orderID)"
-                    >
-                      Xem
-                    </button>
-
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-
-          <!-- Empty state -->
-          <div
-            x-show="filteredOrders.length === 0"
-            class="text-center"
-            style="padding: 20px"
-          >
-            <p>Không tìm thấy hóa đơn nào.</p>
-          </div>
+        <div class="row stats-row">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="bi bi-receipt-cutoff"></i>
+                    </div>
+                    <h5 class="text-muted">Tổng hóa đơn</h5>
+                    <h2 class="mb-0" x-text="orders.length">0</h2>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <h5 class="text-muted">Đã hoàn thành</h5>
+                    <h2 class="mb-0" x-text="orders.filter(o => o.status === 'SERVED').length">0</h2>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <h5 class="text-muted">Đang xử lý</h5>
+                    <h2 class="mb-0"
+                        x-text="orders.filter(o => ['PENDING', 'PREPARING', 'READY'].includes(o.status)).length">0</h2>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <h5 class="text-muted">Doanh thu</h5>
+                    <h2 class="mb-0" x-text="formatCurrency(orders.reduce((sum, o) => sum + (o.total || 0), 0))">0
+                        đ</h2>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <!-- Order Details Modal -->
-      <div class="modal-overlay" x-show="showDetailsModal" x-transition>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Chi tiết hóa đơn #<span x-text="selectedOrder?.orderID"></span>
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="closeDetailsModal()"
-            >
-              &times;
-            </button>
-          </div>
-
-          <div x-show="selectedOrder">
-            <!-- Order Information -->
-            <div class="order-info">
-              <p>
-                <strong>Khách hàng:</strong>
-                <span x-text="selectedOrder?.fullName || 'N/A'"></span>
-              </p>
-              <p>
-                <strong>SĐT:</strong>
-                <span x-text="selectedOrder?.phone || 'N/A'"></span>
-              </p>
-              <p>
-                <strong>Bàn:</strong>
-                <span
-                  x-text="selectedOrder?.table?.tableNumber || 'N/A'"
-                ></span>
-              </p>
-              <p>
-                <strong>Nhân viên:</strong>
-                <span
-                  x-text="selectedOrder?.createdBy?.fullName || 'N/A'"
-                ></span>
-              </p>
-              <p>
-                <strong>Thời gian:</strong>
-                <span x-text="formatDateTime(selectedOrder?.createdAt)"></span>
-              </p>
-              <p>
-                <strong>Trạng thái:</strong>
-                <span
-                  class="status-badge"
-                  :class="`status-${(selectedOrder?.status || 'pending').toLowerCase()}`"
-                  x-text="selectedOrder?.status"
-                ></span>
-              </p>
+        <div class="main-card">
+            <div class="card-header-custom">
+                <h3><i class="bi bi-list-ul me-2"></i>Danh sách Hóa đơn</h3>
+                <button class="btn btn-light btn-sm" @click="loadOrders()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Làm mới
+                </button>
             </div>
 
-            <!-- Order Details Table -->
-            <table class="order-details-table">
-              <thead>
-                <tr>
-                  <th>Tên món</th>
-                  <th>Số lượng</th>
-                  <th>Đơn giá</th>
-                  <th>Thành tiền</th>
-                </tr>
-              </thead>
-              <tbody>
-                <template
-                  x-for="item in orderDetails"
-                  :key="item.orderDetailID"
-                >
-                  <tr>
-                    <td x-text="item.foodItem?.name || 'N/A'"></td>
-                    <td x-text="item.quantity"></td>
-                    <td x-text="formatCurrency(item.priceAtOrderTime)"></td>
-                    <td
-                      x-text="formatCurrency(item.priceAtOrderTime * item.quantity)"
-                    ></td>
-                  </tr>
-                </template>
-                <tr class="total-row">
-                  <td colspan="3"><strong>Tổng tiền:</strong></td>
-                  <td>
-                    <strong
-                      x-text="formatCurrency(calculateTotal(orderDetails))"
-                    ></strong>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <!-- Status Update Controls -->
-            <div
-              class="status-controls"
-              x-show="selectedOrder?.status !== 'Served' && selectedOrder?.status !== 'Cancelled'"
-            >
-              <label for="newStatus">Cập nhật trạng thái:</label>
-              <select id="newStatus" x-model="newStatus" class="filter-select">
-                <template x-for="status in availableStatuses" :key="status">
-                  <option :value="status" x-text="status"></option>
-                </template>
-              </select>
-              <button
-                class="btn-primary"
-                @click="updateOrderStatus()"
-                :disabled="updatingStatus"
-                style="margin-left: 0.5rem"
-              >
-                <span x-show="!updatingStatus">Cập nhật</span>
-                <span x-show="updatingStatus">
-                  <div class="loading-spinner"></div>
-                  Đang cập nhật...
-                </span>
-              </button>
+            <div x-show="loading" class="loading-container">
+                <div class="loading-spinner"></div>
+                <h5>Đang tải dữ liệu...</h5>
+                <p class="text-muted">Vui lòng chờ trong giây lát</p>
             </div>
-          </div>
 
-          <div style="margin-top: 1rem">
-            <button
-              type="button"
-              class="btn-secondary"
-              @click="closeDetailsModal()"
-            >
-              Đóng
-            </button>
-          </div>
+            <div x-show="error" class="alert alert-danger m-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <span x-text="error"></span>
+            </div>
+
+            <div x-show="!loading && !error" class="table-container">
+                <table class="table table-custom">
+                    <thead>
+                    <tr>
+                        <th><i class="bi bi-hash me-1"></i>ID</th>
+                        <th><i class="bi bi-person me-1"></i>Khách hàng</th>
+                        <th><i class="bi bi-calendar me-1"></i>Ngày tạo</th>
+                        <th><i class="bi bi-table me-1"></i>Bàn</th>
+                        <th><i class="bi bi-person-badge me-1"></i>Nhân viên</th>
+                        <th><i class="bi bi-flag me-1"></i>Trạng thái</th>
+                        <th><i class="bi bi-currency-dollar me-1"></i>Tổng tiền</th>
+                        <th><i class="bi bi-gear me-1"></i>Tác Vụ</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <template x-for="order in filteredOrders" :key="order.orderID">
+                        <tr>
+                            <td>
+                                <span class="badge bg-secondary">#<span x-text="order.orderID"></span></span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person-circle me-2 text-muted"></i>
+                                    <span x-text="order.fullName || 'N/A'"></span>
+                                </div>
+                            </td>
+                            <td x-text="formatDateTime(order.createdAt)"></td>
+                            <td>
+                                <span class="badge bg-info" x-text="order.table?.tableNumber || 'N/A'"></span>
+                            </td>
+                            <td x-text="order.createdBy?.fullName || 'N/A'"></td>
+                            <td>
+                                        <span class="status-badge"
+                                              :class="`status-${(order.status || 'pending').toLowerCase()}`">
+                                            <i class="bi" :class="getStatusIcon(order.status)"></i>
+                                            <span x-text="order.status"></span>
+                                        </span>
+                            </td>
+                            <td>
+                                <strong x-text="formatCurrency(order.total)"></strong>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action btn-view " style="width: 80px" @click="viewOrderDetails(order.orderID)">
+                                        <i class="bi bi-eye"></i>
+                                        <span>Xem</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+
+                <div x-show="filteredOrders.length === 0" class="empty-state">
+                    <i class="bi bi-receipt"></i>
+                    <h4>Không có hóa đơn nào</h4>
+                    <p class="text-muted">Chưa có hóa đơn nào được tạo trong hệ thống.</p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
-    <script>
-      function orderManagement() {
+    <div class="modal-overlay" x-show="showDetailsModal" x-transition
+         @click.self="closeDetailsModal()" style="display: none;">
+        <div class="modal-content" @click.stop>
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-receipt-cutoff me-2"></i>
+                    Chi tiết hóa đơn #<span x-text="selectedOrder?.orderID"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" @click="closeDetailsModal()">×</button>
+            </div>
+            <div class="modal-body p-4" x-show="selectedOrder">
+                <div class="order-info-card">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label"><i class="bi bi-person me-2"></i>Khách hàng:</span>
+                                <span x-text="selectedOrder?.fullName || 'N/A'"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label"><i class="bi bi-telephone me-2"></i>SĐT:</span>
+                                <span x-text="selectedOrder?.phone || 'N/A'"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label"><i class="bi bi-table me-2"></i>Bàn:</span>
+                                <span class="badge bg-info" x-text="selectedOrder?.table?.tableNumber || 'N/A'"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label"><i class="bi bi-person-badge me-2"></i>Nhân viên:</span>
+                                <span x-text="selectedOrder?.createdBy?.fullName || 'N/A'"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label"><i class="bi bi-clock me-2"></i>Thời gian:</span>
+                                <span x-text="formatDateTime(selectedOrder?.createdAt)"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label"><i class="bi bi-flag me-2"></i>Trạng thái:</span>
+                                <span class="status-badge"
+                                      :class="`status-${(selectedOrder?.status || 'pending').toLowerCase()}`">
+                                            <i class="bi" :class="getStatusIcon(selectedOrder?.status)"></i>
+                                            <span x-text="selectedOrder?.status"></span>
+                                        </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table order-details-table">
+                        <thead class="table-dark">
+                        <tr>
+                            <th><i class="bi bi-cup-hot me-2"></i>Tên món</th>
+                            <th><i class="bi bi-123 me-2"></i>Số lượng</th>
+                            <th><i class="bi bi-tag me-2"></i>Đơn giá</th>
+                            <th><i class="bi bi-calculator me-2"></i>Thành tiền</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template x-for="item in orderDetails" :key="item.orderDetailID">
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-cup-hot me-2 text-primary"></i>
+                                        <span x-text="item.foodItem?.name || 'N/A'"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary" x-text="item.quantity"></span>
+                                </td>
+                                <td x-text="formatCurrency(item.priceAtOrderTime)"></td>
+                                <td>
+                                    <strong x-text="formatCurrency(item.priceAtOrderTime * item.quantity)"></strong>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot class="total-row">
+                        <tr>
+                            <th colspan="3">
+                                <i class="bi bi-calculator me-2"></i>TỔNG TIỀN:
+                            </th>
+                            <th>
+                                <span x-text="formatCurrency(calculateTotal(orderDetails))"></span>
+                            </th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @click="closeDetailsModal()">
+                    <i class="bi bi-x-circle me-1"></i>Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    function orderManagement() {
         return {
-          orders: [],
-          filteredOrders: [],
-          availableStatuses: [],
-          loading: true,
-          error: null,
-          selectedStatus: "",
-          showDetailsModal: false,
-          selectedOrder: null,
-          orderDetails: [],
-          newStatus: "",
-          updatingStatus: false,
-          alertMessage: {
-            show: false,
-            type: "",
-            text: "",
-          },
+            orders: [],
+            filteredOrders: [],
+            availableStatuses: [],
+            loading: true,
+            error: null,
+            selectedStatus: "",
+            showDetailsModal: false,
+            selectedOrder: null,
+            orderDetails: [],
+            newStatus: "",
+            updatingStatus: false,
+            alertMessage: {
+                show: false,
+                type: "",
+                text: "",
+            },
 
-          async init() {
-            await Promise.all([this.loadOrders(), this.loadStatuses()]);
-          },
+            async init() {
+                await Promise.all([this.loadOrders(), this.loadStatuses()]);
+            },
 
-          async loadOrders() {
-            try {
-              this.loading = true;
-              this.error = null;
-
-              const response = await axios.get("/api/admin/orders");
-
-              if (response.data.success) {
-                this.orders = response.data.data;
-                this.filteredOrders = [...this.orders];
-              } else {
-                this.error =
-                  response.data.message || "Không thể tải danh sách hóa đơn";
-              }
-            } catch (error) {
-              console.error("Error loading orders:", error);
-              this.error = "Lỗi kết nối. Vui lòng thử lại sau.";
-            } finally {
-              this.loading = false;
-            }
-          },
-
-          async loadStatuses() {
-            try {
-              const response = await axios.get("/api/admin/orders/statuses");
-              if (response.data.success) {
-                this.availableStatuses = response.data.data;
-              }
-            } catch (error) {
-              console.error("Error loading statuses:", error);
-            }
-          },
-
-          async filterByStatus() {
-            if (!this.selectedStatus) {
-              this.filteredOrders = [...this.orders];
-              return;
-            }
-
-            try {
-              const response = await axios.get(
-                `/api/admin/orders/status/${this.selectedStatus}`
-              );
-              if (response.data.success) {
-                this.filteredOrders = response.data.data;
-              }
-            } catch (error) {
-              console.error("Error filtering by status:", error);
-            }
-          },
-
-          clearFilters() {
-            this.selectedStatus = "";
-            this.filteredOrders = [...this.orders];
-          },
-
-          async viewOrderDetails(orderId) {
-            try {
-              const response = await axios.get(
-                `/api/admin/orders/${orderId}/details`
-              );
-
-              if (response.data.success) {
-                this.selectedOrder = response.data.data.order;
-                this.orderDetails = response.data.data.orderDetails;
-                this.newStatus = this.selectedOrder.status;
-                this.showDetailsModal = true;
-              } else {
-                this.showAlert("error", "Không thể tải chi tiết hóa đơn");
-              }
-            } catch (error) {
-              console.error("Error loading order details:", error);
-              this.showAlert("error", "Lỗi kết nối. Vui lòng thử lại sau.");
-            }
-          },
-
-          closeDetailsModal() {
-            this.showDetailsModal = false;
-            this.selectedOrder = null;
-            this.orderDetails = [];
-            this.newStatus = "";
-          },
-
-          async updateOrderStatus() {
-            if (this.updatingStatus || !this.newStatus || !this.selectedOrder)
-              return;
-
-            try {
-              this.updatingStatus = true;
-
-              const response = await axios.patch(
-                `/api/admin/orders/${this.selectedOrder.orderID}/status`,
-                { status: this.newStatus }
-              );
-
-              if (response.data.success) {
-                this.selectedOrder.status = this.newStatus;
-                // Update in the main orders list
-                const orderIndex = this.orders.findIndex(
-                  (o) => o.orderID === this.selectedOrder.orderID
-                );
-                if (orderIndex !== -1) {
-                  this.orders[orderIndex].status = this.newStatus;
+            async loadOrders() {
+                try {
+                    this.loading = true;
+                    this.error = null;
+                    const response = await axios.get("/api/admin/orders");
+                    if (response.data.success) {
+                        this.orders = response.data.data;
+                        this.filteredOrders = [...this.orders];
+                    } else {
+                        this.error = response.data.message || "Không thể tải danh sách hóa đơn";
+                    }
+                } catch (error) {
+                    console.error("Error loading orders:", error);
+                    this.error = "Lỗi kết nối. Vui lòng thử lại sau.";
+                } finally {
+                    this.loading = false;
                 }
-                // Update in filtered list
-                const filteredIndex = this.filteredOrders.findIndex(
-                  (o) => o.orderID === this.selectedOrder.orderID
-                );
-                if (filteredIndex !== -1) {
-                  this.filteredOrders[filteredIndex].status = this.newStatus;
+            },
+
+            async loadStatuses() {
+                try {
+                    const response = await axios.get("/api/admin/orders/statuses");
+                    if (response.data.success) {
+                        this.availableStatuses = response.data.data;
+                    }
+                } catch (error) {
+                    console.error("Error loading statuses:", error);
                 }
-                this.showAlert("success", "Cập nhật trạng thái thành công!");
-              } else {
-                this.showAlert(
-                  "error",
-                  response.data.message || "Không thể cập nhật trạng thái"
-                );
-              }
-            } catch (error) {
-              console.error("Error updating status:", error);
-              this.showAlert("error", "Lỗi kết nối. Vui lòng thử lại sau.");
-            } finally {
-              this.updatingStatus = false;
-            }
-          },
+            },
 
-          async deleteOrder(orderId, orderDisplayId) {
-            if (
-              !confirm(`Bạn có chắc chắn muốn xóa hóa đơn #${orderDisplayId}?`)
-            ) {
-              return;
-            }
+            async viewOrderDetails(orderId) {
+                try {
+                    const response = await axios.get(`/api/admin/orders/${orderId}/details`);
+                    if (response.data.success) {
+                        this.selectedOrder = response.data.data.order;
+                        this.orderDetails = response.data.data.orderDetails;
+                        this.newStatus = this.selectedOrder.status;
+                        this.showDetailsModal = true;
+                    } else {
+                        this.showAlert("error", "Không thể tải chi tiết hóa đơn");
+                    }
+                } catch (error) {
+                    console.error("Error loading order details:", error);
+                    this.showAlert("error", "Lỗi kết nối. Vui lòng thử lại sau.");
+                }
+            },
 
-            try {
-              const response = await axios.delete(
-                `/api/admin/orders/${orderId}`
-              );
+            closeDetailsModal() {
+                this.showDetailsModal = false;
+                this.selectedOrder = null;
+                this.orderDetails = [];
+                this.newStatus = "";
+            },
 
-              if (response.data.success) {
-                this.orders = this.orders.filter((o) => o.orderID !== orderId);
-                this.filteredOrders = this.filteredOrders.filter(
-                  (o) => o.orderID !== orderId
-                );
-                this.showAlert("success", "Xóa hóa đơn thành công!");
-              } else {
-                this.showAlert(
-                  "error",
-                  response.data.message || "Không thể xóa hóa đơn"
-                );
-              }
-            } catch (error) {
-              console.error("Error deleting order:", error);
-              this.showAlert("error", "Lỗi kết nối. Vui lòng thử lại sau.");
-            }
-          },
+            getStatusIcon(status) {
+                const icons = {
+                    'PENDING': 'bi-clock-history',
+                    'PREPARING': 'bi-gear-fill',
+                    'READY': 'bi-check-circle-fill',
+                    'SERVED': 'bi-check2-all',
+                    'CANCELLED': 'bi-x-circle-fill'
+                };
+                return icons[status] || 'bi-question-circle';
+            },
 
-          formatDateTime(dateTime) {
-            if (!dateTime) return "N/A";
-            try {
-              const date = new Date(dateTime);
-              return date.toLocaleString("vi-VN", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              });
-            } catch (error) {
-              return dateTime;
-            }
-          },
-          calculateTotal(orderDetails) {
-            return orderDetails.reduce((total, item) => {
-              return total + item.priceAtOrderTime * item.quantity;
-            }, 0);
-          },
-          formatCurrency(amount) {
-            if (amount == null) return "0 đ";
-            try {
-              return new Intl.NumberFormat("vi-VN").format(amount) + " đ";
-            } catch (error) {
-              return amount + " đ";
-            }
-          },
+            formatDateTime(dateTime) {
+                if (!dateTime) return "N/A";
+                try {
+                    const date = new Date(dateTime);
+                    return date.toLocaleString("vi-VN", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+                } catch (error) {
+                    return dateTime;
+                }
+            },
 
-          showAlert(type, text) {
-            this.alertMessage = {
-              show: true,
-              type: type,
-              text: text,
-            };
+            calculateTotal(orderDetails) {
+                return orderDetails.reduce((total, item) => {
+                    return total + (item.priceAtOrderTime * item.quantity);
+                }, 0);
+            },
 
-            setTimeout(() => {
-              this.alertMessage.show = false;
-            }, 3000);
-          },
+            formatCurrency(amount) {
+                if (amount == null) return "0 đ";
+                try {
+                    return new Intl.NumberFormat("vi-VN").format(amount) + " đ";
+                } catch (error) {
+                    return amount + " đ";
+                }
+            },
+
+            showAlert(type, text) {
+                this.alertMessage = {
+                    show: true,
+                    type: type,
+                    text: text,
+                };
+                setTimeout(() => {
+                    this.alertMessage.show = false;
+                }, 5000);
+            },
         };
-      }
-    </script>
-  </body>
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+</body>
 </html>

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -73,16 +74,19 @@ public class TableEmployeeController {
     }
 
     @PostMapping("/{tableId}/add")
-    public ResponseEntity<String> addTableDetail(@PathVariable Integer tableId, @ModelAttribute TableDetail newTableDetail) {
+    public ResponseEntity<String> addTableDetail(@PathVariable Integer tableId,
+            @ModelAttribute TableDetail newTableDetail) {
         Optional<TableEntity> tableOptional = tableService.getTableById(tableId);
         FoodItem foodItem = foodItemService.getFoodItemById(newTableDetail.getFoodItem().getFoodID());
 
-        if (tableOptional.isEmpty() || foodItem == null || newTableDetail.getQuantity() == null || newTableDetail.getQuantity() <= 0) {
+        if (tableOptional.isEmpty() || foodItem == null || newTableDetail.getQuantity() == null
+                || newTableDetail.getQuantity() <= 0) {
             return new ResponseEntity<>("Invalid input for adding item.", HttpStatus.BAD_REQUEST);
         }
 
         if (foodItem.getQuantity() < newTableDetail.getQuantity()) {
-            return new ResponseEntity<>("Số lượng sản phẩm " + foodItem.getName() + " không đủ. Chỉ còn " + foodItem.getQuantity() + " sản phẩm.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Số lượng sản phẩm " + foodItem.getName() + " không đủ. Chỉ còn "
+                    + foodItem.getQuantity() + " sản phẩm.", HttpStatus.BAD_REQUEST);
         }
 
         TableEntity table = tableOptional.get();
@@ -111,7 +115,8 @@ public class TableEmployeeController {
     }
 
     @PostMapping("/detail/{detailId}/update")
-    public ResponseEntity<String> updateTableDetail(@PathVariable Integer detailId, @RequestParam("quantity") Integer newQuantity) {
+    public ResponseEntity<String> updateTableDetail(@PathVariable Integer detailId,
+            @RequestParam("quantity") Integer newQuantity) {
         Optional<TableDetail> tableDetailOptional = tableService.getTableDetailById(detailId);
 
         if (tableDetailOptional.isEmpty() || newQuantity == null || newQuantity <= 0) {
@@ -126,7 +131,8 @@ public class TableEmployeeController {
 
         if (quantityDifference > 0) {
             if (foodItem.getQuantity() < quantityDifference) {
-                return new ResponseEntity<>("Số lượng sản phẩm " + foodItem.getName() + " không đủ để tăng. Chỉ còn " + foodItem.getQuantity() + " sản phẩm.", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Số lượng sản phẩm " + foodItem.getName() + " không đủ để tăng. Chỉ còn "
+                        + foodItem.getQuantity() + " sản phẩm.", HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -177,8 +183,8 @@ public class TableEmployeeController {
 
     @PostMapping("/{tableId}/checkout")
     public String checkoutTable(@PathVariable Integer tableId,
-                                @RequestParam String fullName,
-                                @RequestParam String phone) {
+            @RequestParam String fullName,
+            @RequestParam String phone) {
         Optional<TableEntity> tableOptional = tableService.getTableById(tableId);
         if (tableOptional.isEmpty()) {
             return "redirect:/employee/tables";
@@ -215,7 +221,8 @@ public class TableEmployeeController {
             orderDetail.setOrder(savedOrder);
             orderDetail.setFoodItem(tableDetail.getFoodItem());
             orderDetail.setQuantity(tableDetail.getQuantity());
-            orderDetail.setPriceAtOrderTime(tableDetail.getTotalPrice().divide(BigDecimal.valueOf(tableDetail.getQuantity()))); // đơn giá
+            orderDetail.setPriceAtOrderTime(
+                    tableDetail.getTotalPrice().divide(BigDecimal.valueOf(tableDetail.getQuantity()))); // đơn giá
             tableService.saveOrderDetail(orderDetail);
         }
 
@@ -228,6 +235,7 @@ public class TableEmployeeController {
         return "redirect:/employee/tables/order/" + savedOrder.getOrderID() + "/bill";
 
     }
+
     @GetMapping("/order/{orderId}/bill")
     public String showBill(@PathVariable Integer orderId, Model model) {
         Optional<Order> orderOptional = tableService.getOrderById(orderId);
@@ -250,6 +258,49 @@ public class TableEmployeeController {
         model.addAttribute("orderDetails", orderDetails);
         model.addAttribute("total", total);
         return "order_bill";
+    }
+
+    // REST API endpoint for bill data
+    @GetMapping("/api/order/{orderId}/bill")
+    @ResponseBody
+    public ResponseEntity<?> getBillData(@PathVariable Integer orderId) {
+        try {
+            Optional<Order> orderOptional = tableService.getOrderById(orderId);
+            if (orderOptional.isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                        "success", false,
+                        "message", "Không tìm thấy hóa đơn"));
+            }
+
+            Order order = orderOptional.get();
+            order.getTable().setOrders(null);
+            order.setTableForView(order.getTable());
+            List<OrderDetail> orderDetails = order.getOrderDetails();
+
+            BigDecimal total = BigDecimal.ZERO;
+            for (OrderDetail item : orderDetails) {
+                if (item.getPriceAtOrderTime() != null && item.getQuantity() != null) {
+                    BigDecimal itemTotal = item.getPriceAtOrderTime().multiply(BigDecimal.valueOf(item.getQuantity()));
+                    total = total.add(itemTotal);
+                }
+            }
+
+            Map<String, Object> billData = Map.of(
+                    "order", order,
+                    "orderDetails", orderDetails,
+                    "total", total);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Lấy dữ liệu hóa đơn thành công",
+                    "data", billData));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Lỗi hệ thống: " + e.getMessage()));
+        }
     }
 
 }

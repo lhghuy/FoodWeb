@@ -28,29 +28,28 @@ public class PageController {
 
     @GetMapping("/redirect")
     public String redirectAfterLogin(Authentication auth) {
-    if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_QuanLy"))) {
-        return "redirect:/admin";
-    } else if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_NhanVien"))) {
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_QuanLy"))) {
+            return "redirect:/admin";
+        } else if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_NhanVien"))) {
             return "redirect:/employee";
         } else {
-        return "redirect:/index";
+            return "redirect:/index";
+        }
     }
-}
 
     @GetMapping("/login")
     public String loginPage() {
-        return "login"; 
+        return "login";
     }
 
     @GetMapping("/cart")
     public String cartPage() {
-        return "cart"; 
+        return "cart";
     }
 
     @GetMapping("/menu")
     public String menuPage(Model model) {
-        model.addAttribute("allFoods", foodItemRepository.findAll());
-        return "menu"; 
+        return "menu";
     }
 
     @GetMapping("/admin")
@@ -59,7 +58,7 @@ public class PageController {
         User loggedInUser = userService.getUserByUsername(principal.getName());
         model.addAttribute("loggedInUser", loggedInUser);
 
-        return "admin"; 
+        return "admin";
     }
 
     @GetMapping("/employee")
@@ -69,26 +68,26 @@ public class PageController {
 
     @GetMapping("/support")
     public String supportPage() {
-    return "support"; 
+        return "support";
     }
 
     @GetMapping("/status")
     public String statusPage() {
-        return "status"; 
-    }   
+        return "status";
+    }
 
     @GetMapping("/productmanagement")
     public String productManagementPage() {
-        return "productmanagement"; 
+        return "productmanagement";
     }
 
     @GetMapping("/revenue")
     public String revenuePage() {
-        return "revenue"; 
-    }           
+        return "revenue";
+    }
 
     @GetMapping("/staffmanagement")
     public String staffManagementPage() {
-        return "staffmanagement"; 
+        return "staffmanagement";
     }
 }

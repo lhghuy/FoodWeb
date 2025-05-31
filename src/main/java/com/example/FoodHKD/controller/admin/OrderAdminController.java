@@ -25,7 +25,6 @@ public class OrderAdminController {
     @GetMapping
     public String getAllOrders(Model model) {
         List<Order> orders = orderRepository.findAll();
-        model.addAttribute("orders", orders);
         model.addAttribute("pageTitle", "Quản lý Hóa đơn");
         return "ordermanagement";
     }
@@ -37,19 +36,6 @@ public class OrderAdminController {
             return "redirect:/admin/orders";
         }
 
-        List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(order);
-
-        BigDecimal total = BigDecimal.ZERO;
-        for (OrderDetail item : orderDetails) {
-            if (item.getPriceAtOrderTime() != null && item.getQuantity() != null) {
-                BigDecimal itemTotal = item.getPriceAtOrderTime().multiply(BigDecimal.valueOf(item.getQuantity()));
-                total = total.add(itemTotal);
-            }
-        }
-
-        model.addAttribute("order", order);
-        model.addAttribute("orderDetails", orderDetails);
-        model.addAttribute("total", total);
         return "orderdetail";
     }
 }

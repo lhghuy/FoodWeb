@@ -39,44 +39,10 @@ public class FoodAdminController {
         return "productform";
     }
 
-    @PostMapping("/add")
-    public String addFoodItem(@ModelAttribute("foodItem") @Valid FoodItem foodItem,
-                          BindingResult result,
-                          Model model) {
-        if (result.hasErrors()) {
-            return "productform";
-        }
-        foodItemService.createFoodItem(foodItem);
-        return "redirect:/admin/foods";
-}
-
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") Integer id, Model model) {
         return "productform";
     }
 
-   @PostMapping("/edit/{id}")
-    public String updateFoodItem(@PathVariable("id") Integer id,
-                             @ModelAttribute("foodItem") @Valid FoodItem foodItem,
-                             BindingResult result,
-                             Model model) {
-        if (result.hasErrors()) {
-            return "productform";
-        }
-        foodItemService.updateFoodItem(id, foodItem);
-        return "redirect:/admin/foods";
-}
-
-
-    @GetMapping("/delete/{id}")
-    public String deleteFoodItem(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
-        try {
-            foodItemService.deleteFoodItem(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Xoá món ăn thành công!");
-        } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-        }
-        return "redirect:/admin/foods";
-    }
 }

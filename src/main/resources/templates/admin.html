@@ -1,56 +1,660 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard - Admin Panel</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: none;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
 
-<body>
-<div class="sidebar">
-    <h2>ADMIN</h2>
-    <ul>
-        <li><a th:href="@{/admin}">Dashboard</a></li>
-        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
-        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
-        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
-        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
-    </ul>
-</div>
+      .stats-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--card-color, #007bff),
+          var(--card-color-light, #66b3ff)
+        );
+      }
 
-<div class="main-content">
-    <div class="header">
-        <h1>Dashboard</h1>
-        <div class="user-info">
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button type="submit" class="btn-logout">Đăng xuất</button>
-            </form>
+      .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      }
 
-            <img th:src="@{${loggedInUser.avatar}}" alt="Avatar" class="user-avatar"/>
+      .stats-card.primary {
+        --card-color: #667eea;
+        --card-color-light: #764ba2;
+      }
 
-            <span th:text="${loggedInUser.fullName}" style="width: 100px; height: 100px">Admin</span>
+      .stats-card.success {
+        --card-color: #56ab2f;
+        --card-color-light: #a8e6cf;
+      }
+
+      .stats-card.warning {
+        --card-color: #f093fb;
+        --card-color-light: #f5576c;
+      }
+
+      .stats-card.info {
+        --card-color: #4facfe;
+        --card-color-light: #00f2fe;
+      }
+
+      .stats-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 1rem;
+      }
+
+      .stats-icon.primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+      }
+
+      .stats-icon.success {
+        background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+      }
+
+      .stats-icon.warning {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+      }
+
+      .stats-icon.info {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+      }
+
+      .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+      }
+
+      .stats-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .stats-change {
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+      }
+
+      .stats-change.positive {
+        color: #28a745;
+      }
+
+      .stats-change.negative {
+        color: #dc3545;
+      }
+
+      .card-modern {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+      }
+
+      .table-modern {
+        margin: 0;
+      }
+
+      .table-modern thead th {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.8rem;
+      }
+
+      .table-modern tbody td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+      }
+
+      .table-modern tbody tr:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+      }
+
+      .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .status-completed {
+        background-color: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
+        border: 1px solid rgba(39, 174, 96, 0.2);
+      }
+
+      .status-pending {
+        background-color: rgba(243, 156, 18, 0.1);
+        color: #f39c12;
+        border: 1px solid rgba(243, 156, 18, 0.2);
+      }
+
+      .status-processing {
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.2);
+      }
+
+      .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .quick-action-btn {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-decoration: none;
+        color: #2c3e50;
+        text-align: center;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .quick-action-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+        text-decoration: none;
+      }
+
+      .quick-action-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+        margin: 1rem 0;
+      }
+
+      .welcome-section {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .welcome-section::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+      }
+
+      .welcome-section::after {
+        content: "";
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+      }
+
+      .welcome-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      @media (max-width: 768px) {
+        .stats-number {
+          font-size: 1.5rem;
+        }
+
+        .quick-actions {
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        .stats-card {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-light">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-crown me-2"></i>ADMIN</h2>
+      </div>
+      <div class="sidebar-nav">
+        <ul>
+          <li>
+            <a th:href="@{/admin}" class="active">
+              <i class="fas fa-tachometer-alt"></i>Dashboard
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/admin/foods}">
+              <i class="fas fa-utensils"></i>Quản lý sản phẩm
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/admin/tables}">
+              <i class="fas fa-table"></i>Quản lý bàn
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/admin/users}">
+              <i class="fas fa-users"></i>Quản lý nhân viên
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/admin/orders}">
+              <i class="fas fa-receipt"></i>Quản lý hoá đơn
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="top-navbar">
+        <h1 class="page-title">
+          <i class="fas fa-tachometer-alt me-3"></i>Dashboard
+        </h1>
+        <div class="user-actions">
+          <div class="user-info">
+            <img
+              th:src="@{${loggedInUser.avatar}}"
+              alt="Avatar"
+              class="user-avatar me-2"
+              style="
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                object-fit: cover;
+              "
+            />
+            <span th:text="${loggedInUser.fullName}">Admin</span>
+            <i class="fas fa-user-circle ms-2"></i>
+          </div>
+          <form th:action="@{/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+              <i class="fas fa-sign-out-alt me-1"></i>Đăng xuất
+            </button>
+          </form>
         </div>
+      </div>
+
+      <div class="content-wrapper">
+        <div class="welcome-section">
+          <div class="welcome-content">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="mb-3">
+                  <i class="fas fa-sun me-2"></i>
+                  Chào mừng trở lại,
+                  <span th:text="${loggedInUser.fullName}">Admin</span>!
+                </h2>
+                <p class="mb-0 opacity-90">
+                  Hôm nay là một ngày tuyệt vời để quản lý nhà hàng của bạn. Hãy
+                  xem tổng quan hoạt động kinh doanh bên dưới.
+                </p>
+              </div>
+              <div class="col-md-4 text-end">
+                <i class="fas fa-chart-line fa-4x opacity-50"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--        <div class="row g-4 mb-4">-->
+        <!--          <div class="col-xl-3 col-md-6">-->
+        <!--            <div class="stats-card primary">-->
+        <!--              <div class="stats-icon primary">-->
+        <!--                <i class="fas fa-utensils"></i>-->
+        <!--              </div>-->
+        <!--              <div class="stats-number">156</div>-->
+        <!--              <div class="stats-label">Tổng Món Ăn</div>-->
+        <!--              <div class="stats-change positive">-->
+        <!--                <i class="fas fa-arrow-up me-1"></i>+12% so với tháng trước-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+
+        <!--          <div class="col-xl-3 col-md-6">-->
+        <!--            <div class="stats-card success">-->
+        <!--              <div class="stats-icon success">-->
+        <!--                <i class="fas fa-shopping-cart"></i>-->
+        <!--              </div>-->
+        <!--              <div class="stats-number">1,248</div>-->
+        <!--              <div class="stats-label">Đơn Hàng</div>-->
+        <!--              <div class="stats-change positive">-->
+        <!--                <i class="fas fa-arrow-up me-1"></i>+8% so với tuần trước-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+
+        <!--          <div class="col-xl-3 col-md-6">-->
+        <!--            <div class="stats-card warning">-->
+        <!--              <div class="stats-icon warning">-->
+        <!--                <i class="fas fa-users"></i>-->
+        <!--              </div>-->
+        <!--              <div class="stats-number">24</div>-->
+        <!--              <div class="stats-label">Nhân Viên</div>-->
+        <!--              <div class="stats-change positive">-->
+        <!--                <i class="fas fa-arrow-up me-1"></i>+2 nhân viên mới-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+
+        <!--          <div class="col-xl-3 col-md-6">-->
+        <!--            <div class="stats-card info">-->
+        <!--              <div class="stats-icon info">-->
+        <!--                <i class="fas fa-money-bill-wave"></i>-->
+        <!--              </div>-->
+        <!--              <div class="stats-number">245M</div>-->
+        <!--              <div class="stats-label">Doanh Thu (VND)</div>-->
+        <!--              <div class="stats-change positive">-->
+        <!--                <i class="fas fa-arrow-up me-1"></i>+15% so với tháng trước-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+
+        <!--        <div class="quick-actions">-->
+        <!--          <a th:href="@{/admin/foods/add}" class="quick-action-btn">-->
+        <!--            <i class="fas fa-plus-circle quick-action-icon"></i>-->
+        <!--            <div>-->
+        <!--              <div class="fw-semibold">Thêm Món Ăn</div>-->
+        <!--              <small class="text-muted">Tạo món ăn mới</small>-->
+        <!--            </div>-->
+        <!--          </a>-->
+        <!--          <a th:href="@{/admin/tables}" class="quick-action-btn">-->
+        <!--            <i class="fas fa-table quick-action-icon"></i>-->
+        <!--            <div>-->
+        <!--              <div class="fw-semibold">Quản Lý Bàn</div>-->
+        <!--              <small class="text-muted">Xem trạng thái bàn</small>-->
+        <!--            </div>-->
+        <!--          </a>-->
+        <!--          <a th:href="@{/admin/users/add}" class="quick-action-btn">-->
+        <!--            <i class="fas fa-user-plus quick-action-icon"></i>-->
+        <!--            <div>-->
+        <!--              <div class="fw-semibold">Thêm Nhân Viên</div>-->
+        <!--              <small class="text-muted">Tuyển nhân viên mới</small>-->
+        <!--            </div>-->
+        <!--          </a>-->
+        <!--          <a th:href="@{/admin/orders}" class="quick-action-btn">-->
+        <!--            <i class="fas fa-receipt quick-action-icon"></i>-->
+        <!--            <div>-->
+        <!--              <div class="fw-semibold">Xem Đơn Hàng</div>-->
+        <!--              <small class="text-muted">Theo dõi đơn hàng</small>-->
+        <!--            </div>-->
+        <!--          </a>-->
+        <!--        </div>-->
+
+        <!--        <div class="row g-4">-->
+        <!--          <div class="col-lg-8">-->
+        <!--            <div class="card-modern">-->
+        <!--              <div class="card-header-custom">-->
+        <!--                <h3 class="mb-0">-->
+        <!--                  <i class="fas fa-chart-bar me-2"></i>Doanh Thu 7 Ngày Qua-->
+        <!--                </h3>-->
+        <!--              </div>-->
+        <!--              <div class="card-body">-->
+        <!--                <div class="chart-container">-->
+        <!--                  <canvas id="revenueChart"></canvas>-->
+        <!--                </div>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+
+        <!--          <div class="col-lg-4">-->
+        <!--            <div class="card-modern">-->
+        <!--              <div class="card-header-custom">-->
+        <!--                <h3 class="mb-0">-->
+        <!--                  <i class="fas fa-chart-pie me-2"></i>Món Ăn Phổ Biến-->
+        <!--                </h3>-->
+        <!--              </div>-->
+        <!--              <div class="card-body">-->
+        <!--                <div class="chart-container">-->
+        <!--                  <canvas id="popularFoodsChart"></canvas>-->
+        <!--                </div>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+
+        <!--        <div class="row g-4 mt-4">-->
+        <!--          <div class="col-12">-->
+        <!--            <div class="card-modern">-->
+        <!--              <div class="card-header-custom">-->
+        <!--                <h3 class="mb-0">-->
+        <!--                  <i class="fas fa-clock me-2"></i>Đơn Hàng Gần Đây-->
+        <!--                </h3>-->
+        <!--              </div>-->
+        <!--              <div class="card-body p-0">-->
+        <!--                <table class="table table-modern mb-0">-->
+        <!--                  <thead>-->
+        <!--                    <tr>-->
+        <!--                      <th>Mã Đơn</th>-->
+        <!--                      <th>Khách Hàng</th>-->
+        <!--                      <th>Bàn</th>-->
+        <!--                      <th>Tổng Tiền</th>-->
+        <!--                      <th>Trạng Thái</th>-->
+        <!--                      <th>Thời Gian</th>-->
+        <!--                    </tr>-->
+        <!--                  </thead>-->
+        <!--                  <tbody>-->
+        <!--                    <tr>-->
+        <!--                      <td class="fw-semibold">#DH001</td>-->
+        <!--                      <td>Nguyễn Văn A</td>-->
+        <!--                      <td>Bàn 05</td>-->
+        <!--                      <td class="fw-semibold text-success">450,000 VND</td>-->
+        <!--                      <td>-->
+        <!--                        <span class="status-badge status-completed"-->
+        <!--                          >Hoàn thành</span-->
+        <!--                        >-->
+        <!--                      </td>-->
+        <!--                      <td>10 phút trước</td>-->
+        <!--                    </tr>-->
+        <!--                    <tr>-->
+        <!--                      <td class="fw-semibold">#DH002</td>-->
+        <!--                      <td>Trần Thị B</td>-->
+        <!--                      <td>Bàn 12</td>-->
+        <!--                      <td class="fw-semibold text-success">320,000 VND</td>-->
+        <!--                      <td>-->
+        <!--                        <span class="status-badge status-processing"-->
+        <!--                          >Đang chế biến</span-->
+        <!--                        >-->
+        <!--                      </td>-->
+        <!--                      <td>15 phút trước</td>-->
+        <!--                    </tr>-->
+        <!--                    <tr>-->
+        <!--                      <td class="fw-semibold">#DH003</td>-->
+        <!--                      <td>Lê Văn C</td>-->
+        <!--                      <td>Bàn 08</td>-->
+        <!--                      <td class="fw-semibold text-success">680,000 VND</td>-->
+        <!--                      <td>-->
+        <!--                        <span class="status-badge status-pending"-->
+        <!--                          >Chờ xác nhận</span-->
+        <!--                        >-->
+        <!--                      </td>-->
+        <!--                      <td>25 phút trước</td>-->
+        <!--                    </tr>-->
+        <!--                    <tr>-->
+        <!--                      <td class="fw-semibold">#DH004</td>-->
+        <!--                      <td>Phạm Thị D</td>-->
+        <!--                      <td>Bàn 03</td>-->
+        <!--                      <td class="fw-semibold text-success">275,000 VND</td>-->
+        <!--                      <td>-->
+        <!--                        <span class="status-badge status-completed"-->
+        <!--                          >Hoàn thành</span-->
+        <!--                        >-->
+        <!--                      </td>-->
+        <!--                      <td>30 phút trước</td>-->
+        <!--                    </tr>-->
+        <!--                    <tr>-->
+        <!--                      <td class="fw-semibold">#DH005</td>-->
+        <!--                      <td>Hoàng Văn E</td>-->
+        <!--                      <td>Bàn 15</td>-->
+        <!--                      <td class="fw-semibold text-success">520,000 VND</td>-->
+        <!--                      <td>-->
+        <!--                        <span class="status-badge status-processing"-->
+        <!--                          >Đang chế biến</span-->
+        <!--                        >-->
+        <!--                      </td>-->
+        <!--                      <td>45 phút trước</td>-->
+        <!--                    </tr>-->
+        <!--                  </tbody>-->
+        <!--                </table>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+      </div>
     </div>
 
-    <div class="card">
-        <h3>Nhân viên</h3>
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Tên</th>
-                <th>Chức vụ</th>
-                <th>Email</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="emp : ${employees}">
-                <td th:text="${emp.name}"></td>
-                <td th:text="${emp.role}"></td>
-                <td th:text="${emp.email}"></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-</body>
+    <script>
+      // Revenue Chart
+      const revenueCtx = document
+        .getElementById("revenueChart")
+        .getContext("2d");
+      new Chart(revenueCtx, {
+        type: "line",
+        data: {
+          labels: ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"],
+          datasets: [
+            {
+              label: "Doanh Thu (Triệu VND)",
+              data: [32, 28, 35, 42, 38, 45, 48],
+              borderColor: "rgb(102, 126, 234)",
+              backgroundColor: "rgba(102, 126, 234, 0.1)",
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: "rgb(102, 126, 234)",
+              pointBorderColor: "white",
+              pointBorderWidth: 2,
+              pointRadius: 6,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: "rgba(0, 0, 0, 0.05)",
+              },
+            },
+            x: {
+              grid: {
+                display: false,
+              },
+            },
+          },
+        },
+      });
+
+      // Popular Foods Chart
+      const popularFoodsCtx = document
+        .getElementById("popularFoodsChart")
+        .getContext("2d");
+      new Chart(popularFoodsCtx, {
+        type: "doughnut",
+        data: {
+          labels: ["Phở Bò", "Bánh Mì", "Cơm Tấm", "Bún Chả", "Khác"],
+          datasets: [
+            {
+              data: [30, 25, 20, 15, 10],
+              backgroundColor: [
+                "rgba(102, 126, 234, 0.8)",
+                "rgba(86, 171, 47, 0.8)",
+                "rgba(240, 147, 251, 0.8)",
+                "rgba(79, 172, 254, 0.8)",
+                "rgba(255, 159, 64, 0.8)",
+              ],
+              borderWidth: 0,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+              },
+            },
+          },
+        },
+      });
+    </script>
+  </body>
 </html>

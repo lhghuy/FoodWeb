@@ -2,22 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Admin Dashboard</title>
+    <title>Quản Lý Nhân Viên - Admin Dashboard</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <script
       defer
       src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
     ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js"
-      integrity="sha512-FPlUpimug7gt7Hn7swE8N2pHw/+oQMq/+R/hH/2hZ43VOQ+Kjh25rQzuLyPz7aUWKlRpI7wXbY6+U3oFPGjPOA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-      body {
-        min-height: 100vh;
-      }
       .modal-overlay {
         position: fixed;
         top: 0;
@@ -31,112 +32,36 @@
         justify-content: center;
       }
 
-      .modal-content {
+      .modal-content-custom {
         background-color: #fff;
-        border-radius: 0.5rem;
+        border-radius: 12px;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        padding: 2rem;
+        padding: 0;
         width: 90%;
         max-width: 600px;
         max-height: 90vh;
+        overflow: hidden;
+      }
+
+      .modal-header-custom {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+        border-radius: 12px 12px 0 0;
+      }
+
+      .modal-body-custom {
+        padding: 2rem;
+        max-height: 70vh;
         overflow-y: auto;
       }
 
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #eee;
-      }
-
-      .modal-title {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 600;
-      }
-
-      .btn-close {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #999;
-      }
-
-      .btn-close:hover {
-        color: #333;
-      }
-
-      .form-group {
-        margin-bottom: 1rem;
-      }
-
-      .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-      }
-
-      .form-control {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-        font-size: 1rem;
-      }
-
-      .form-control:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-      }
-
-      .error-message {
-        color: #dc3545;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-      }
-
-      .modal-footer {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: flex-end;
-        margin-top: 2rem;
-      }
-
-      .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-      }
-
-      .btn-primary:hover:not(:disabled) {
-        background-color: #0056b3;
-      }
-
-      .btn-primary:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-
-      .btn-secondary {
-        background-color: #6c757d;
-        border-color: #6c757d;
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-      }
-
-      .btn-secondary:hover:not(:disabled) {
-        background-color: #545b62;
+      .modal-footer-custom {
+        padding: 1.5rem 2rem;
+        border-top: 1px solid #eee;
+        background-color: #f8f9fa;
+        border-radius: 0 0 12px 12px;
       }
 
       .loading-spinner {
@@ -155,489 +80,577 @@
         }
       }
 
-      .search-container {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        align-items: center;
-      }
-
-      .search-input {
-        flex: 1;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-      }
-
-      .filter-select {
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-        min-width: 120px;
-      }
-
-      .btn-search {
-        background-color: #28a745;
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-      }
-
-      .btn-search:hover {
-        background-color: #218838;
-      }
-
-      .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-      }
-
-      .btn-edit,
-      .btn-delete {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        border-radius: 0.25rem;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-      }
-
-      .btn-edit {
-        background-color: #28a745;
-        color: white;
-      }
-
-      .btn-edit:hover {
-        background-color: #218838;
-        color: white;
-      }
-
-      .btn-delete {
-        background-color: #dc3545;
-        color: white;
-      }
-
-      .btn-delete:hover {
-        background-color: #c82333;
-      }
-
-      .add-user-btn {
-        background-color: #007bff;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-        margin-bottom: 1rem;
-        text-decoration: none;
-        display: inline-block;
-      }
-
-      .add-user-btn:hover {
-        background-color: #0056b3;
-        color: white;
-      }
-
       .avatar-img {
         width: 60px;
         height: 60px;
         border-radius: 50%;
         object-fit: cover;
+        border: 2px solid #dee2e6;
       }
 
       .role-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
       .role-admin {
-        background-color: #dc3545;
-        color: white;
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.2);
       }
 
       .role-employee {
-        background-color: #007bff;
-        color: white;
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.2);
       }
 
       .role-manager {
-        background-color: #28a745;
+        background-color: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
+        border: 1px solid rgba(39, 174, 96, 0.2);
+      }
+
+      .search-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        margin-bottom: 1.5rem;
+      }
+
+      .btn-gradient-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
         color: white;
+        transition: all 0.3s ease;
+      }
+
+      .btn-gradient-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        color: white;
+      }
+
+      .btn-gradient-success {
+        background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+        border: none;
+        color: white;
+      }
+
+      .btn-gradient-success:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(86, 171, 47, 0.3);
+        color: white;
+      }
+
+      .btn-gradient-danger {
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        border: none;
+        color: white;
+      }
+
+      .btn-gradient-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(255, 65, 108, 0.3);
+        color: white;
+      }
+
+      .card-modern {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+      }
+
+      .card-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      }
+
+      .table-modern {
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+      }
+
+      .table-modern thead th {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .table-modern tbody td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+      }
+
+      .table-modern tbody tr:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+      }
+
+      .alert-modern {
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
       }
     </style>
   </head>
 
-  <body>
-    <div class="sidebar1">
-      <h2>ADMIN</h2>
-      <ul>
-        <li><a th:href="@{/admin}">Dashboard</a></li>
-        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
-        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
-        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
-        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
-      </ul>
+  <body class="bg-light">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-crown me-2"></i>ADMIN</h2>
+      </div>
+      <div class="sidebar-nav">
+        <ul>
+          <li>
+            <a th:href="@{/admin}"
+              ><i class="fas fa-tachometer-alt"></i>Dashboard</a
+            >
+          </li>
+          <li>
+            <a th:href="@{/admin/foods}"
+              ><i class="fas fa-utensils"></i>Quản lý sản phẩm</a
+            >
+          </li>
+          <li>
+            <a th:href="@{/admin/tables}"
+              ><i class="fas fa-table"></i>Quản lý bàn</a
+            >
+          </li>
+          <li>
+            <a th:href="@{/admin/users}" class="active"
+              ><i class="fas fa-users"></i>Quản lý nhân viên</a
+            >
+          </li>
+          <li>
+            <a th:href="@{/admin/orders}"
+              ><i class="fas fa-receipt"></i>Quản lý hoá đơn</a
+            >
+          </li>
+        </ul>
+      </div>
     </div>
 
     <div class="main-content" x-data="userManagement()">
-      <!-- Alert Messages -->
-      <div
-        x-show="alertMessage.show"
-        :class="alertMessage.type === 'success' ? 'alert alert-success' : 'alert alert-danger'"
-        x-text="alertMessage.text"
-        x-transition.opacity
-      ></div>
-
-      <div class="header">
-        <h1>Quản Lý Nhân Viên</h1>
-        <div class="user-info">
-          <form th:action="@{/logout}" method="post" style="display: inline">
-            <button type="submit" class="btn-logout">Đăng xuất</button>
-          </form>
-          <span th:text="${loggedInUser.fullName}">Admin</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Danh sách Nhân viên</h3>
-
-        <!-- Search and Filter Controls -->
-        <div class="search-container">
-          <input
-            type="text"
-            x-model="searchQuery"
-            @input.debounce.300ms="searchUsers()"
-            class="search-input"
-            placeholder="Tìm kiếm theo tên đăng nhập hoặc họ tên..."
-          />
-          <select
-            x-model="selectedRole"
-            @change="filterByRole()"
-            class="filter-select"
-          >
-            <option value="">Tất cả vai trò</option>
-            <template x-for="role in availableRoles" :key="role">
-              <option :value="role" x-text="role"></option>
-            </template>
-          </select>
-          <button class="btn-search" @click="clearFilters()">Xóa bộ lọc</button>
-        </div>
-
-        <!-- Add User Button -->
-        <button class="add-user-btn" @click="openCreateModal()">
-          Thêm Nhân viên mới
-        </button>
-
-        <!-- Loading indicator -->
-        <div x-show="loading" class="text-center" style="padding: 20px">
-          <p>Đang tải dữ liệu...</p>
-        </div>
-
-        <!-- Error message -->
-        <div x-show="error" class="alert alert-danger" x-text="error"></div>
-
-        <!-- Users Table -->
-        <div x-show="!loading && !error">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th>Avatar</th>
-                <th>Tên đăng nhập</th>
-                <th>Họ và tên</th>
-                <th>Vai trò</th>
-                <th>Tác Vụ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template
-                x-for="(user, index) in filteredUsers"
-                :key="user.userID"
-              >
-                <tr>
-                  <td x-text="index + 1"></td>
-                  <td>
-                    <img
-                      :src="user.avatar || '/images/default-avatar.png'"
-                      class="avatar-img"
-                      alt="Avatar"
-                      onerror="this.src='/images/default-avatar.png'"
-                    />
-                  </td>
-                  <td x-text="user.username"></td>
-                  <td x-text="user.fullName"></td>
-                  <td>
-                    <span
-                      class="role-badge"
-                      :class="`role-${user.role?.toLowerCase() || 'employee'}`"
-                      x-text="user.role"
-                    ></span>
-                  </td>
-                  <td class="action-buttons">
-                    <button class="btn-edit" @click="openEditModal(user)">
-                      Sửa
-                    </button>
-                    <button
-                      class="btn-delete"
-                      x-show="user.userID !== currentUserId"
-                      @click="deleteUser(user.userID, user.fullName)"
-                    >
-                      Xóa
-                    </button>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-
-          <!-- Empty state -->
-          <div
-            x-show="filteredUsers.length === 0"
-            class="text-center"
-            style="padding: 20px"
-          >
-            <p>Không tìm thấy nhân viên nào.</p>
+      <div class="top-navbar">
+        <h1 class="page-title">
+          <i class="fas fa-users me-3"></i>Quản Lý Nhân Viên
+        </h1>
+        <div class="user-actions">
+          <div class="user-info">
+            <span th:text="${loggedInUser.fullName}">Admin</span>
+            <i class="fas fa-user-circle ms-2"></i>
           </div>
-        </div>
-      </div>
-
-      <!-- Create User Modal -->
-      <div class="modal-overlay" x-show="showCreateModal" x-transition>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Thêm nhân viên mới</h5>
-            <button type="button" class="btn-close" @click="closeCreateModal()">
-              &times;
+          <form th:action="@{/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+              <i class="fas fa-sign-out-alt me-1"></i>Đăng xuất
             </button>
-          </div>
-          <form @submit.prevent="createUser()">
-            <div class="form-group">
-              <label for="createUsername">Tên đăng nhập:</label>
+          </form>
+        </div>
+      </div>
+
+      <div class="content-wrapper">
+        <div
+          x-show="alertMessage.show"
+          :class="alertMessage.type === 'success' ? 'alert alert-success alert-modern' : 'alert alert-danger alert-modern'"
+          x-text="alertMessage.text"
+          x-transition.opacity
+        ></div>
+
+        <div class="search-container">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-secondary">
+                <i class="fas fa-search me-2"></i>Tìm kiếm nhân viên
+              </label>
               <input
                 type="text"
-                id="createUsername"
-                x-model="createForm.username"
-                class="form-control"
-                required
+                x-model="searchQuery"
+                @input.debounce.300ms="searchUsers()"
+                class="form-control form-control-lg"
+                placeholder="Nhập tên đăng nhập hoặc họ tên..."
               />
-              <div
-                x-show="createForm.errors.username"
-                x-text="createForm.errors.username"
-                class="error-message"
-              ></div>
             </div>
-
-            <div class="form-group">
-              <label for="createPassword">Mật khẩu:</label>
-              <input
-                type="password"
-                id="createPassword"
-                x-model="createForm.passwordHash"
-                class="form-control"
-                required
-              />
-              <div
-                x-show="createForm.errors.passwordHash"
-                x-text="createForm.errors.passwordHash"
-                class="error-message"
-              ></div>
-            </div>
-
-            <div class="form-group">
-              <label for="createFullName">Họ và tên:</label>
-              <input
-                type="text"
-                id="createFullName"
-                x-model="createForm.fullName"
-                class="form-control"
-                required
-              />
-              <div
-                x-show="createForm.errors.fullName"
-                x-text="createForm.errors.fullName"
-                class="error-message"
-              ></div>
-            </div>
-
-            <div class="form-group">
-              <label for="createRole">Vai trò:</label>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold text-secondary">
+                <i class="fas fa-filter me-2"></i>Lọc theo vai trò
+              </label>
               <select
-                id="createRole"
-                x-model="createForm.role"
-                class="form-control"
-                required
+                x-model="selectedRole"
+                @change="filterByRole()"
+                class="form-select form-select-lg"
               >
-                <option value="">Chọn vai trò</option>
+                <option value="">Tất cả vai trò</option>
                 <template x-for="role in availableRoles" :key="role">
                   <option :value="role" x-text="role"></option>
                 </template>
               </select>
-              <div
-                x-show="createForm.errors.role"
-                x-text="createForm.errors.role"
-                class="error-message"
-              ></div>
             </div>
-
-            <div class="form-group">
-              <label for="createAvatar">URL Avatar (tùy chọn):</label>
-              <input
-                type="url"
-                id="createAvatar"
-                x-model="createForm.avatar"
-                class="form-control"
-                placeholder="https://example.com/avatar.jpg"
-              />
-              <div
-                x-show="createForm.errors.avatar"
-                x-text="createForm.errors.avatar"
-                class="error-message"
-              ></div>
-            </div>
-
-            <div class="modal-footer">
+            <div class="col-md-3">
               <button
-                type="submit"
-                class="btn-primary"
-                :disabled="submittingCreate"
+                class="btn btn-outline-secondary btn-lg w-100"
+                @click="clearFilters()"
               >
-                <span x-show="!submittingCreate">Thêm nhân viên</span>
-                <span x-show="submittingCreate">
-                  <div class="loading-spinner"></div>
-                  Đang thêm...
-                </span>
+                <i class="fas fa-times me-2"></i>Xóa bộ lọc
               </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="main-card card-modern">
+          <div class="card-header-custom">
+            <h3 class="mb-0">
+              <i class="fas fa-list me-2"></i>Danh sách Nhân viên
+            </h3>
+            <button class="btn btn-gradient-primary" @click="openCreateModal()">
+              <i class="fas fa-plus me-2"></i>Thêm Nhân viên mới
+            </button>
+          </div>
+
+          <div class="card-body p-0">
+            <div x-show="loading" class="loading-container">
+              <div class="loading-spinner"></div>
+              <p class="mt-3 mb-0">Đang tải dữ liệu...</p>
+            </div>
+
+            <div
+              x-show="error"
+              class="alert alert-danger alert-modern m-3"
+              x-text="error"
+            ></div>
+
+            <div x-show="!loading && !error" class="table-container">
+              <table class="table table-modern mb-0">
+                <thead>
+                  <tr>
+                    <th width="5%">STT</th>
+                    <th width="10%">Avatar</th>
+                    <th width="20%">Tên đăng nhập</th>
+                    <th width="25%">Họ và tên</th>
+                    <th width="15%">Vai trò</th>
+                    <th width="25%">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template
+                    x-for="(user, index) in filteredUsers"
+                    :key="user.userID"
+                  >
+                    <tr>
+                      <td>
+                        <span
+                          class="badge bg-light text-dark"
+                          x-text="index + 1"
+                        ></span>
+                      </td>
+                      <td>
+                        <img
+                          :src="user.avatar || '/images/default-avatar.png'"
+                          class="avatar-img"
+                          alt="Avatar"
+                          onerror="this.src='/images/default-avatar.png'"
+                        />
+                      </td>
+                      <td>
+                        <div class="fw-semibold" x-text="user.username"></div>
+                      </td>
+                      <td>
+                        <div
+                          class="fw-semibold text-primary"
+                          x-text="user.fullName"
+                        ></div>
+                      </td>
+                      <td>
+                        <span
+                          class="role-badge"
+                          :class="`role-${user.role?.toLowerCase() || 'employee'}`"
+                          x-text="user.role"
+                        ></span>
+                      </td>
+                      <td>
+                        <div class="action-buttons">
+                          <button
+                            class="btn btn-gradient-success btn-sm me-2"
+                            @click="openEditModal(user)"
+                          >
+                            <i class="fas fa-edit me-1"></i>Sửa
+                          </button>
+                          <button
+                            x-show="user.userID !== currentUserId"
+                            class="btn btn-gradient-danger btn-sm"
+                            @click="deleteUser(user.userID, user.fullName)"
+                          >
+                            <i class="fas fa-trash me-1"></i>Xóa
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+
+              <div x-show="filteredUsers.length === 0" class="empty-state">
+                <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">Không tìm thấy nhân viên nào</h5>
+                <p class="text-muted">
+                  Thử thay đổi bộ lọc hoặc tìm kiếm với từ khóa khác
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-overlay" x-show="showCreateModal" x-transition>
+        <div class="modal-content-custom">
+          <div class="modal-header-custom">
+            <h5 class="mb-0">
+              <i class="fas fa-user-plus me-2"></i>Thêm nhân viên mới
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              @click="closeCreateModal()"
+            ></button>
+          </div>
+          <form @submit.prevent="createUser()">
+            <div class="modal-body-custom">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold"
+                    >Tên đăng nhập <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    x-model="createForm.username"
+                    class="form-control"
+                    required
+                  />
+                  <div
+                    x-show="createForm.errors.username"
+                    x-text="createForm.errors.username"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold"
+                    >Mật khẩu <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="password"
+                    x-model="createForm.passwordHash"
+                    class="form-control"
+                    required
+                  />
+                  <div
+                    x-show="createForm.errors.passwordHash"
+                    x-text="createForm.errors.passwordHash"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold"
+                    >Họ và tên <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    x-model="createForm.fullName"
+                    class="form-control"
+                    required
+                  />
+                  <div
+                    x-show="createForm.errors.fullName"
+                    x-text="createForm.errors.fullName"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold"
+                    >Vai trò <span class="text-danger">*</span></label
+                  >
+                  <select
+                    x-model="createForm.role"
+                    class="form-select"
+                    required
+                  >
+                    <option value="">Chọn vai trò</option>
+                    <template x-for="role in availableRoles" :key="role">
+                      <option :value="role" x-text="role"></option>
+                    </template>
+                  </select>
+                  <div
+                    x-show="createForm.errors.role"
+                    x-text="createForm.errors.role"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">URL Avatar</label>
+                  <input
+                    type="url"
+                    x-model="createForm.avatar"
+                    class="form-control"
+                    placeholder="https://example.com/avatar.jpg"
+                  />
+                  <div
+                    x-show="createForm.errors.avatar"
+                    x-text="createForm.errors.avatar"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer-custom">
               <button
                 type="button"
-                class="btn-secondary"
+                class="btn btn-secondary me-2"
                 @click="closeCreateModal()"
                 :disabled="submittingCreate"
               >
-                Hủy
+                <i class="fas fa-times me-1"></i>Hủy
+              </button>
+              <button
+                type="submit"
+                class="btn btn-gradient-primary"
+                :disabled="submittingCreate"
+              >
+                <span x-show="!submittingCreate"
+                  ><i class="fas fa-save me-1"></i>Thêm nhân viên</span
+                >
+                <span x-show="submittingCreate">
+                  <div class="loading-spinner me-2"></div>
+                  Đang thêm...
+                </span>
               </button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- Edit User Modal -->
       <div class="modal-overlay" x-show="showEditModal" x-transition>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Sửa thông tin nhân viên</h5>
-            <button type="button" class="btn-close" @click="closeEditModal()">
-              &times;
-            </button>
+        <div class="modal-content-custom">
+          <div class="modal-header-custom">
+            <h5 class="mb-0">
+              <i class="fas fa-user-edit me-2"></i>Sửa thông tin nhân viên
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              @click="closeEditModal()"
+            ></button>
           </div>
           <form @submit.prevent="updateUser()">
-            <div class="form-group">
-              <label for="editUsername">Tên đăng nhập:</label>
-              <input
-                type="text"
-                id="editUsername"
-                x-model="editForm.username"
-                class="form-control"
-                required
-              />
-              <div
-                x-show="editForm.errors.username"
-                x-text="editForm.errors.username"
-                class="error-message"
-              ></div>
+            <div class="modal-body-custom">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold"
+                    >Tên đăng nhập <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    x-model="editForm.username"
+                    class="form-control"
+                    required
+                  />
+                  <div
+                    x-show="editForm.errors.username"
+                    x-text="editForm.errors.username"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Mật khẩu mới</label>
+                  <input
+                    type="password"
+                    x-model="editForm.passwordHash"
+                    class="form-control"
+                    placeholder="Để trống nếu không đổi"
+                  />
+                  <div
+                    x-show="editForm.errors.passwordHash"
+                    x-text="editForm.errors.passwordHash"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold"
+                    >Họ và tên <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    x-model="editForm.fullName"
+                    class="form-control"
+                    required
+                  />
+                  <div
+                    x-show="editForm.errors.fullName"
+                    x-text="editForm.errors.fullName"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold"
+                    >Vai trò <span class="text-danger">*</span></label
+                  >
+                  <select x-model="editForm.role" class="form-select" required>
+                    <option value="">Chọn vai trò</option>
+                    <template x-for="role in availableRoles" :key="role">
+                      <option :value="role" x-text="role"></option>
+                    </template>
+                  </select>
+                  <div
+                    x-show="editForm.errors.role"
+                    x-text="editForm.errors.role"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">URL Avatar</label>
+                  <input
+                    type="url"
+                    x-model="editForm.avatar"
+                    class="form-control"
+                  />
+                  <div
+                    x-show="editForm.errors.avatar"
+                    x-text="editForm.errors.avatar"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+              </div>
             </div>
-
-            <div class="form-group">
-              <label for="editPassword"
-                >Mật khẩu mới (để trống nếu không đổi):</label
-              >
-              <input
-                type="password"
-                id="editPassword"
-                x-model="editForm.passwordHash"
-                class="form-control"
-              />
-              <div
-                x-show="editForm.errors.passwordHash"
-                x-text="editForm.errors.passwordHash"
-                class="error-message"
-              ></div>
-            </div>
-
-            <div class="form-group">
-              <label for="editFullName">Họ và tên:</label>
-              <input
-                type="text"
-                id="editFullName"
-                x-model="editForm.fullName"
-                class="form-control"
-                required
-              />
-              <div
-                x-show="editForm.errors.fullName"
-                x-text="editForm.errors.fullName"
-                class="error-message"
-              ></div>
-            </div>
-
-            <div class="form-group">
-              <label for="editRole">Vai trò:</label>
-              <select
-                id="editRole"
-                x-model="editForm.role"
-                class="form-control"
-                required
-              >
-                <option value="">Chọn vai trò</option>
-                <template x-for="role in availableRoles" :key="role">
-                  <option :value="role" x-text="role"></option>
-                </template>
-              </select>
-              <div
-                x-show="editForm.errors.role"
-                x-text="editForm.errors.role"
-                class="error-message"
-              ></div>
-            </div>
-
-            <div class="form-group">
-              <label for="editAvatar">URL Avatar:</label>
-              <input
-                type="url"
-                id="editAvatar"
-                x-model="editForm.avatar"
-                class="form-control"
-              />
-              <div
-                x-show="editForm.errors.avatar"
-                x-text="editForm.errors.avatar"
-                class="error-message"
-              ></div>
-            </div>
-
-            <div class="modal-footer">
-              <button
-                type="submit"
-                class="btn-primary"
-                :disabled="submittingEdit"
-              >
-                <span x-show="!submittingEdit">Cập nhật</span>
-                <span x-show="submittingEdit">
-                  <div class="loading-spinner"></div>
-                  Đang cập nhật...
-                </span>
-              </button>
+            <div class="modal-footer-custom">
               <button
                 type="button"
-                class="btn-secondary"
+                class="btn btn-secondary me-2"
                 @click="closeEditModal()"
                 :disabled="submittingEdit"
               >
-                Hủy
+                <i class="fas fa-times me-1"></i>Hủy
+              </button>
+              <button
+                type="submit"
+                class="btn btn-gradient-primary"
+                :disabled="submittingEdit"
+              >
+                <span x-show="!submittingEdit"
+                  ><i class="fas fa-save me-1"></i>Cập nhật</span
+                >
+                <span x-show="submittingEdit">
+                  <div class="loading-spinner me-2"></div>
+                  Đang cập nhật...
+                </span>
               </button>
             </div>
           </form>
@@ -660,11 +673,7 @@
           showEditModal: false,
           submittingCreate: false,
           submittingEdit: false,
-          alertMessage: {
-            show: false,
-            type: "",
-            text: "",
-          },
+          alertMessage: { show: false, type: "", text: "" },
           createForm: {
             username: "",
             passwordHash: "",
@@ -684,14 +693,12 @@
           },
 
           async init() {
-            // Get current user ID from the template variable
             const loggedInUserElement = document.querySelector(
               '[th\\:text="${loggedInUser.userID}"]'
             );
             if (loggedInUserElement) {
               this.currentUserId = parseInt(loggedInUserElement.textContent);
             }
-
             await Promise.all([this.loadUsers(), this.loadRoles()]);
           },
 
@@ -699,9 +706,7 @@
             try {
               this.loading = true;
               this.error = null;
-
               const response = await axios.get("/api/admin/users");
-
               if (response.data.success) {
                 this.users = response.data.data;
                 this.filteredUsers = [...this.users];
@@ -733,7 +738,6 @@
               this.filteredUsers = [...this.users];
               return;
             }
-
             try {
               const response = await axios.get(
                 `/api/admin/users/search?q=${encodeURIComponent(
@@ -753,7 +757,6 @@
               this.filteredUsers = [...this.users];
               return;
             }
-
             try {
               const response = await axios.get(
                 `/api/admin/users/role/${this.selectedRole}`
@@ -798,11 +801,9 @@
 
           async createUser() {
             if (this.submittingCreate) return;
-
             try {
               this.submittingCreate = true;
               this.createForm.errors = {};
-
               const response = await axios.post("/api/admin/users", {
                 username: this.createForm.username,
                 passwordHash: this.createForm.passwordHash,
@@ -810,7 +811,6 @@
                 role: this.createForm.role,
                 avatar: this.createForm.avatar || null,
               });
-
               if (response.data.success) {
                 this.closeCreateModal();
                 this.showAlert("success", "Thêm nhân viên thành công!");
@@ -861,28 +861,22 @@
 
           async updateUser() {
             if (this.submittingEdit) return;
-
             try {
               this.submittingEdit = true;
               this.editForm.errors = {};
-
               const updateData = {
                 username: this.editForm.username,
                 fullName: this.editForm.fullName,
                 role: this.editForm.role,
                 avatar: this.editForm.avatar || null,
               };
-
-              // Only include password if it's provided
               if (this.editForm.passwordHash) {
                 updateData.passwordHash = this.editForm.passwordHash;
               }
-
               const response = await axios.put(
                 `/api/admin/users/${this.editForm.id}`,
                 updateData
               );
-
               if (response.data.success) {
                 this.closeEditModal();
                 this.showAlert("success", "Cập nhật nhân viên thành công!");
@@ -906,15 +900,10 @@
           },
 
           async deleteUser(userId, userName) {
-            if (
-              !confirm(`Bạn có chắc chắn muốn xóa nhân viên "${userName}"?`)
-            ) {
+            if (!confirm(`Bạn có chắc chắn muốn xóa nhân viên "${userName}"?`))
               return;
-            }
-
             try {
               const response = await axios.delete(`/api/admin/users/${userId}`);
-
               if (response.data.success) {
                 this.users = this.users.filter((u) => u.userID !== userId);
                 this.filteredUsers = this.filteredUsers.filter(
@@ -944,12 +933,7 @@
           },
 
           showAlert(type, text) {
-            this.alertMessage = {
-              show: true,
-              type: type,
-              text: text,
-            };
-
+            this.alertMessage = { show: true, type: type, text: text };
             setTimeout(() => {
               this.alertMessage.show = false;
             }, 3000);

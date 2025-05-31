@@ -2,19 +2,22 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Quản lý bàn</title>
+    <title>Quản Lý Bàn - Admin Dashboard</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <script
       defer
       src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
     ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js"
-      integrity="sha512-FPlUpimug7gt7Hn7swE8N2pHw/+oQMq/+R/hH/2hZ43VOQ+Kjh25rQzuLyPz7aUWKlRpI7wXbY6+U3oFPGjPOA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
       .modal-overlay {
         position: fixed;
@@ -29,112 +32,36 @@
         justify-content: center;
       }
 
-      .modal-content {
+      .modal-content-custom {
         background-color: #fff;
-        border-radius: 0.5rem;
+        border-radius: 12px;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        padding: 2rem;
+        padding: 0;
         width: 90%;
-        max-width: 500px;
+        max-width: 600px;
         max-height: 90vh;
+        overflow: hidden;
+      }
+
+      .modal-header-custom {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+        border-radius: 12px 12px 0 0;
+      }
+
+      .modal-body-custom {
+        padding: 2rem;
+        max-height: 70vh;
         overflow-y: auto;
       }
 
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #eee;
-      }
-
-      .modal-title {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 600;
-      }
-
-      .btn-close {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #999;
-      }
-
-      .btn-close:hover {
-        color: #333;
-      }
-
-      .form-group {
-        margin-bottom: 1rem;
-      }
-
-      .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-      }
-
-      .form-control {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-        font-size: 1rem;
-      }
-
-      .form-control:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-      }
-
-      .error-message {
-        color: #dc3545;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-      }
-
-      .modal-footer {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: flex-end;
-        margin-top: 2rem;
-      }
-
-      .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-      }
-
-      .btn-primary:hover:not(:disabled) {
-        background-color: #0056b3;
-      }
-
-      .btn-primary:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-
-      .btn-secondary {
-        background-color: #6c757d;
-        border-color: #6c757d;
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-      }
-
-      .btn-secondary:hover:not(:disabled) {
-        background-color: #545b62;
+      .modal-footer-custom {
+        padding: 1.5rem 2rem;
+        border-top: 1px solid #eee;
+        background-color: #f8f9fa;
+        border-radius: 0 0 12px 12px;
       }
 
       .loading-spinner {
@@ -153,282 +80,447 @@
         }
       }
 
-      .table-actions {
-        display: flex;
-        gap: 0.5rem;
-      }
-
-      .btn-edit,
-      .btn-delete {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        border-radius: 0.25rem;
-        text-decoration: none;
+      .table-item {
+        transition: all 0.3s ease;
         border: none;
-        cursor: pointer;
+        border-radius: 12px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        overflow: hidden;
       }
 
-      .btn-edit {
-        background-color: #28a745;
-        color: white;
+      .table-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
       }
 
-      .btn-edit:hover {
-        background-color: #218838;
-        color: white;
+      .table-item .card-body {
+        padding: 1.5rem;
+        text-align: center;
       }
 
-      .btn-delete {
-        background-color: #dc3545;
-        color: white;
-      }
-
-      .btn-delete:hover {
-        background-color: #c82333;
-      }
-
-      .add-table-btn {
-        background-color: #007bff;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
+      .table-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
         margin-bottom: 1rem;
-        text-decoration: none;
+      }
+
+      .status-tag {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
         display: inline-block;
       }
 
-      .add-table-btn:hover {
-        background-color: #0056b3;
+      .status-trong {
+        background-color: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
+        border: 1px solid rgba(39, 174, 96, 0.2);
+      }
+
+      .status-dangphucvu {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.2);
+      }
+
+      .btn-gradient-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
         color: white;
+        transition: all 0.3s ease;
+      }
+
+      .btn-gradient-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        color: white;
+      }
+
+      .btn-gradient-success {
+        background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+      }
+
+      .btn-gradient-success:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(86, 171, 47, 0.3);
+        color: white;
+      }
+
+      .btn-gradient-warning {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+      }
+
+      .btn-gradient-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(240, 147, 251, 0.3);
+        color: white;
+      }
+
+      .btn-gradient-danger {
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+      }
+
+      .btn-gradient-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(255, 65, 108, 0.3);
+        color: white;
+      }
+
+      .card-modern {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+      }
+
+      .alert-modern {
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .tables-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6c757d;
+        grid-column: 1 / -1;
+      }
+
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        color: #6c757d;
+      }
+
+      .action-buttons-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+      }
+
+      .table-icon {
+        font-size: 2.5rem;
+        color: #3498db;
+        margin-bottom: 1rem;
+      }
+
+      @media (max-width: 768px) {
+        .tables-grid {
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 1rem;
+        }
+
+        .action-buttons-grid {
+          flex-direction: column;
+        }
+
+        .action-buttons-grid .btn {
+          width: 100%;
+        }
       }
     </style>
   </head>
-  <body>
+
+  <body class="bg-light">
     <div class="sidebar">
-      <h2>ADMIN</h2>
-      <ul>
-        <li><a th:href="@{/admin}">Dashboard</a></li>
-        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
-        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
-        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
-        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
-      </ul>
+      <div class="sidebar-header">
+        <h2><i class="fas fa-crown me-2"></i>ADMIN</h2>
+      </div>
+      <div class="sidebar-nav">
+        <ul>
+          <li>
+            <a th:href="@{/admin}">
+              <i class="fas fa-tachometer-alt"></i>Dashboard
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/admin/foods}">
+              <i class="fas fa-utensils"></i>Quản lý sản phẩm
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/admin/tables}" class="active">
+              <i class="fas fa-table"></i>Quản lý bàn
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/admin/users}">
+              <i class="fas fa-users"></i>Quản lý nhân viên
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/admin/orders}">
+              <i class="fas fa-receipt"></i>Quản lý hoá đơn
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <div class="main-content" x-data="tableManagement()">
-      <!-- Alert Messages -->
-      <div
-        x-show="alertMessage.show"
-        :class="alertMessage.type === 'success' ? 'alert alert-success' : 'alert alert-danger'"
-        x-text="alertMessage.text"
-        x-transition.opacity
-      ></div>
-
-      <div class="header">
-        <h1>Quản Lý Bàn</h1>
-        <div class="user-info">
-          <form th:action="@{/logout}" method="post" style="display: inline">
-            <button type="submit" class="btn-logout">Đăng xuất</button>
+      <div class="top-navbar">
+        <h1 class="page-title"><i class="fas fa-table me-3"></i>Quản Lý Bàn</h1>
+        <div class="user-actions">
+          <div class="user-info">
+            <span th:text="${loggedInUser}">Admin</span>
+            <i class="fas fa-user-circle ms-2"></i>
+          </div>
+          <form th:action="@{/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+              <i class="fas fa-sign-out-alt me-1"></i>Đăng xuất
+            </button>
           </form>
-          <span th:text="${loggedInUser}">Admin</span>
         </div>
       </div>
 
-      <div class="card">
-        <h3>Danh sách bàn</h3>
+      <div class="content-wrapper">
+        <div
+          x-show="alertMessage.show"
+          :class="alertMessage.type === 'success' ? 'alert alert-success alert-modern' : 'alert alert-danger alert-modern'"
+          x-text="alertMessage.text"
+          x-transition.opacity
+        ></div>
 
-        <!-- Add Table Button -->
-        <button
-                style="width: 200px"
-                class="add-table-btn flex" @click="openCreateModal()">
-          <span x-show="!!!creatingTable">Thêm bàn mới</span>
-          <span x-show="creatingTable">
-            <div class="loading-spinner"></div>
-            Đang thêm...
-          </span>
-        </button>
-
-        <!-- Loading indicator -->
-        <div x-show="loading" class="text-center" style="padding: 20px">
-          <p>Đang tải dữ liệu...</p>
-        </div>
-
-        <!-- Error message -->
-        <div x-show="error" class="alert alert-danger" x-text="error"></div>
-
-        <!-- Tables Grid -->
-          <div x-show="!loading && !error" class="container">
-              <div class="row" x-show="tables.length > 0">
-                  <template x-for="table in tables" :key="table.tableID">
-                      <!-- 4 cột trên desktop (>=1200px), 3 cột trên md (>=768px), 2 cột trên sm (>=576px), 1 cột dưới đó -->
-                      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                          <div class="card h-100 table-item">
-                              <div class="card-body">
-                                  <h5 class="card-title">
-                                      Bàn <span x-text="table.tableNumber"></span>
-                                  </h5>
-                                  <p
-                                          class="status-tag"
-                                          :class="table.status === 'Trong' ? 'status-trong' : 'status-dangphucvu'"
-                                          x-text="table.status === 'Trong' ? 'Trống' : 'Đang phục vụ'"
-                                  ></p>
-                                  <div class="table-actions mt-3 d-flex flex-wrap gap-2">
-                                      <a
-                                              :href="`/admin/tables/${table.tableID}`"
-                                              class="btn btn-primary btn-sm"
-                                      >
-                                          Chi tiết
-                                      </a>
-                                      <button class="btn btn-warning btn-sm" @click="openEditModal(table)">
-                                          Sửa
-                                      </button>
-                                      <button
-                                              class="btn btn-danger btn-sm"
-                                              @click="deleteTable(table.tableID, table.tableNumber)"
-                                      >
-                                          Xóa
-                                      </button>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </template>
-              </div>
-
-              <!-- Empty state -->
-              <div
-                      x-show="tables.length === 0"
-                      class="text-center py-4"
-                      style="grid-column: 1 / -1"
-              >
-                  <p>Không có bàn nào.</p>
-              </div>
-          </div>
-
-
-          <!-- Create Table Modal -->
-      <div class="modal-overlay" x-show="showCreateModal" x-transition>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Thêm bàn mới</h5>
-            <button type="button" class="btn-close" @click="closeCreateModal()">
-              &times;
+        <div class="main-card card-modern">
+          <div class="card-header-custom">
+            <h3 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách bàn</h3>
+            <button class="btn btn-gradient-primary" @click="openCreateModal()">
+              <i class="fas fa-plus me-2"></i>Thêm bàn mới
             </button>
           </div>
+
+          <div class="card-body">
+            <div x-show="loading" class="loading-container">
+              <div class="loading-spinner"></div>
+              <p class="mt-3 mb-0">Đang tải dữ liệu...</p>
+            </div>
+
+            <div
+              x-show="error"
+              class="alert alert-danger alert-modern"
+              x-text="error"
+            ></div>
+
+            <div x-show="!loading && !error">
+              <div class="tables-grid">
+                <template x-for="table in tables" :key="table.tableID">
+                  <div class="table-item card h-100">
+                    <div class="card-body">
+                      <div class="table-icon">
+                        <i class="fas fa-chair"></i>
+                      </div>
+                      <h5 class="table-number">
+                        Bàn <span x-text="table.tableNumber"></span>
+                      </h5>
+                      <div
+                        class="status-tag"
+                        :class="table.status === 'Trong' ? 'status-trong' : 'status-dangphucvu'"
+                        x-text="table.status === 'Trong' ? 'Trống' : 'Đang phục vụ'"
+                      ></div>
+                      <div class="action-buttons-grid">
+                        <a
+                          :href="`/admin/tables/${table.tableID}`"
+                          class="btn btn-gradient-primary btn-sm"
+                        >
+                          <i class="fas fa-eye me-1"></i>Chi tiết
+                        </a>
+                        <button
+                          class="btn btn-gradient-warning btn-sm"
+                          @click="openEditModal(table)"
+                        >
+                          <i class="fas fa-edit me-1"></i>Sửa
+                        </button>
+                        <button
+                          class="btn btn-gradient-danger btn-sm"
+                          @click="deleteTable(table.tableID, table.tableNumber)"
+                        >
+                          <i class="fas fa-trash me-1"></i>Xóa
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <div x-show="tables.length === 0" class="empty-state">
+                <i class="fas fa-table fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">Chưa có bàn nào</h5>
+                <p class="text-muted">
+                  Nhấn "Thêm bàn mới" để tạo bàn đầu tiên
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-overlay" x-show="showCreateModal" x-transition>
+        <div class="modal-content-custom">
+          <div class="modal-header-custom">
+            <h5 class="mb-0">
+              <i class="fas fa-plus-circle me-2"></i>Thêm bàn mới
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              @click="closeCreateModal()"
+            ></button>
+          </div>
           <form @submit.prevent="createTable()">
-            <div class="form-group">
-              <label for="createTableNumber">Số bàn:</label>
-              <input
-                type="text"
-                id="createTableNumber"
-                x-model="createForm.tableNumber"
-                class="form-control"
-                required
-                placeholder="Ví dụ: Bàn 01"
-              />
-              <div
-                x-show="createForm.errors.tableNumber"
-                x-text="createForm.errors.tableNumber"
-                class="error-message"
-              ></div>
+            <div class="modal-body-custom">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-tag me-2"></i>Số bàn
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    x-model="createForm.tableNumber"
+                    class="form-control form-control-lg"
+                    required
+                    placeholder="Ví dụ: Bàn 01"
+                  />
+                  <div
+                    x-show="createForm.errors.tableNumber"
+                    x-text="createForm.errors.tableNumber"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-toggle-on me-2"></i>Trạng thái
+                  </label>
+                  <select
+                    x-model="createForm.status"
+                    class="form-select form-select-lg"
+                  >
+                    <option value="Trong">Trống</option>
+                    <option value="DangPhucVu">Đang phục vụ</option>
+                  </select>
+                </div>
+              </div>
             </div>
-
-            <div class="form-group">
-              <label for="createStatus">Trạng thái:</label>
-              <select
-                id="createStatus"
-                x-model="createForm.status"
-                class="form-control"
-              >
-                <option value="Trong">Trống</option>
-                <option value="DangPhucVu">Đang phục vụ</option>
-              </select>
-            </div>
-
-            <div class="modal-footer">
-              <button
-                type="submit"
-                class="btn-primary"
-                :disabled="submittingCreate"
-              >
-                <span x-show="!submittingCreate">Thêm bàn</span>
-                <span x-show="submittingCreate">
-                  <div class="loading-spinner"></div>
-                  Đang thêm...
-                </span>
-              </button>
+            <div class="modal-footer-custom">
               <button
                 type="button"
-                class="btn-secondary"
+                class="btn btn-secondary me-2"
                 @click="closeCreateModal()"
                 :disabled="submittingCreate"
               >
-                Hủy
+                <i class="fas fa-times me-1"></i>Hủy
+              </button>
+              <button
+                type="submit"
+                class="btn btn-gradient-primary"
+                :disabled="submittingCreate"
+              >
+                <span x-show="!submittingCreate">
+                  <i class="fas fa-save me-1"></i>Thêm bàn
+                </span>
+                <span x-show="submittingCreate">
+                  <div class="loading-spinner me-2"></div>
+                  Đang thêm...
+                </span>
               </button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- Edit Table Modal -->
       <div class="modal-overlay" x-show="showEditModal" x-transition>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Sửa thông tin bàn</h5>
-            <button type="button" class="btn-close" @click="closeEditModal()">
-              &times;
-            </button>
+        <div class="modal-content-custom">
+          <div class="modal-header-custom">
+            <h5 class="mb-0">
+              <i class="fas fa-edit me-2"></i>Sửa thông tin bàn
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              @click="closeEditModal()"
+            ></button>
           </div>
           <form @submit.prevent="updateTable()">
-            <div class="form-group">
-              <label for="editTableNumber">Số bàn:</label>
-              <input
-                type="text"
-                id="editTableNumber"
-                x-model="editForm.tableNumber"
-                class="form-control"
-                required
-              />
-              <div
-                x-show="editForm.errors.tableNumber"
-                x-text="editForm.errors.tableNumber"
-                class="error-message"
-              ></div>
+            <div class="modal-body-custom">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-tag me-2"></i>Số bàn
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    x-model="editForm.tableNumber"
+                    class="form-control form-control-lg"
+                    required
+                  />
+                  <div
+                    x-show="editForm.errors.tableNumber"
+                    x-text="editForm.errors.tableNumber"
+                    class="text-danger mt-1 small"
+                  ></div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-toggle-on me-2"></i>Trạng thái
+                  </label>
+                  <select
+                    x-model="editForm.status"
+                    class="form-select form-select-lg"
+                  >
+                    <option value="Trong">Trống</option>
+                    <option value="DangPhucVu">Đang phục vụ</option>
+                  </select>
+                </div>
+              </div>
             </div>
-
-            <div class="form-group">
-              <label for="editStatus">Trạng thái:</label>
-              <select
-                id="editStatus"
-                x-model="editForm.status"
-                class="form-control"
-              >
-                <option value="Trong">Trống</option>
-                <option value="DangPhucVu">Đang phục vụ</option>
-              </select>
-            </div>
-
-            <div class="modal-footer">
-              <button
-                type="submit"
-                class="btn-primary"
-                :disabled="submittingEdit"
-              >
-                <span x-show="!submittingEdit">Cập nhật</span>
-                <span x-show="submittingEdit">
-                  <div class="loading-spinner"></div>
-                  Đang cập nhật...
-                </span>
-              </button>
+            <div class="modal-footer-custom">
               <button
                 type="button"
-                class="btn-secondary"
+                class="btn btn-secondary me-2"
                 @click="closeEditModal()"
                 :disabled="submittingEdit"
               >
-                Hủy
+                <i class="fas fa-times me-1"></i>Hủy
+              </button>
+              <button
+                type="submit"
+                class="btn btn-gradient-primary"
+                :disabled="submittingEdit"
+              >
+                <span x-show="!submittingEdit">
+                  <i class="fas fa-save me-1"></i>Cập nhật
+                </span>
+                <span x-show="submittingEdit">
+                  <div class="loading-spinner me-2"></div>
+                  Đang cập nhật...
+                </span>
               </button>
             </div>
           </form>
@@ -442,27 +534,13 @@
           tables: [],
           loading: true,
           error: null,
-          creatingTable: false,
           showCreateModal: false,
           showEditModal: false,
           submittingCreate: false,
           submittingEdit: false,
-          alertMessage: {
-            show: false,
-            type: "",
-            text: "",
-          },
-          createForm: {
-            tableNumber: "",
-            status: "Trong",
-            errors: {},
-          },
-          editForm: {
-            id: null,
-            tableNumber: "",
-            status: "Trong",
-            errors: {},
-          },
+          alertMessage: { show: false, type: "", text: "" },
+          createForm: { tableNumber: "", status: "Trong", errors: {} },
+          editForm: { id: null, tableNumber: "", status: "Trong", errors: {} },
 
           async init() {
             await this.loadTables();
@@ -472,9 +550,7 @@
             try {
               this.loading = true;
               this.error = null;
-
               const response = await axios.get("/api/admin/tables");
-
               if (response.data.success) {
                 this.tables = response.data.data;
               } else {
@@ -490,35 +566,24 @@
           },
 
           openCreateModal() {
-            this.createForm = {
-              tableNumber: "",
-              status: "Trong",
-              errors: {},
-            };
+            this.createForm = { tableNumber: "", status: "Trong", errors: {} };
             this.showCreateModal = true;
           },
 
           closeCreateModal() {
             this.showCreateModal = false;
-            this.createForm = {
-              tableNumber: "",
-              status: "Trong",
-              errors: {},
-            };
+            this.createForm = { tableNumber: "", status: "Trong", errors: {} };
           },
 
           async createTable() {
             if (this.submittingCreate) return;
-
             try {
               this.submittingCreate = true;
               this.createForm.errors = {};
-
               const response = await axios.post("/api/admin/tables", {
                 tableNumber: this.createForm.tableNumber,
                 status: this.createForm.status,
               });
-
               if (response.data.success) {
                 this.closeCreateModal();
                 this.showAlert("success", "Thêm bàn thành công!");
@@ -563,11 +628,9 @@
 
           async updateTable() {
             if (this.submittingEdit) return;
-
             try {
               this.submittingEdit = true;
               this.editForm.errors = {};
-
               const response = await axios.put(
                 `/api/admin/tables/${this.editForm.id}`,
                 {
@@ -575,7 +638,6 @@
                   status: this.editForm.status,
                 }
               );
-
               if (response.data.success) {
                 this.closeEditModal();
                 this.showAlert("success", "Cập nhật bàn thành công!");
@@ -599,15 +661,11 @@
           },
 
           async deleteTable(tableId, tableName) {
-            if (!confirm(`Bạn có chắc chắn muốn xóa "${tableName}"?`)) {
-              return;
-            }
-
+            if (!confirm(`Bạn có chắc chắn muốn xóa "${tableName}"?`)) return;
             try {
               const response = await axios.delete(
                 `/api/admin/tables/${tableId}`
               );
-
               if (response.data.success) {
                 this.tables = this.tables.filter((t) => t.tableID !== tableId);
                 this.showAlert("success", "Xóa bàn thành công!");
@@ -634,12 +692,7 @@
           },
 
           showAlert(type, text) {
-            this.alertMessage = {
-              show: true,
-              type: type,
-              text: text,
-            };
-
+            this.alertMessage = { show: true, type: type, text: text };
             setTimeout(() => {
               this.alertMessage.show = false;
             }, 3000);

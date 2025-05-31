@@ -29,39 +29,17 @@ public class UserAdminController {
 
     @GetMapping("/add")
     public String showAddUserForm(Model model) {
-        User newUser = new User();
-        newUser.setCreatedAt(LocalDateTime.now());
-        model.addAttribute("user", newUser);
         model.addAttribute("pageTitle", "Thêm Nhân viên mới");
         return "userform";
     }
 
-    @PostMapping("/add")
-    public String addUser(@ModelAttribute("user") User user) {
-        userService.createUser(user);
-        return "redirect:/admin/users";
-    }
 
     @GetMapping("/edit/{id}")
     public String showEditUserForm(@PathVariable("id") Integer id, Model model) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            return "redirect:/admin/users";
-        }
-        model.addAttribute("user", user);
+
         model.addAttribute("pageTitle", "Sửa thông tin Nhân viên");
         return "userform";
     }
 
-    @PostMapping("/edit/{id}")
-    public String updateUser(@PathVariable("id") Integer id, @ModelAttribute("user") User user) {
-        userService.updateUser(id, user);
-        return "redirect:/admin/users";
-    }
 
-    @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Integer id) {
-        userService.deleteUser(id);
-        return "redirect:/admin/users";
-    }
 }
