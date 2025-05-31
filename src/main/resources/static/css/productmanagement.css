@@ -1,0 +1,366 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #b71c1c;
+    color: white;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.sidebar a:hover {
+    background-color: #8e0000;
+}
+
+.sidebar a img {
+    margin-right: 10px;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.main-content h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Product List */
+.product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-item img {
+    width: 60px;
+    height: 60px;
+    border-radius: 5px;
+    background-color: #e0e0e0;
+}
+
+.product-item .details {
+    flex: 1;
+    margin-left: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.product-item .details h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.product-item .details p {
+    margin: 5px 0 0;
+    font-size: 16px;
+    color: #757575;
+}
+
+/* Buttons */
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    color: white;
+}
+
+button.add {
+    background-color: #2196f3;
+}
+
+button.update {
+    background-color: #ffeb3b;
+    color: black;
+}
+
+button.delete {
+    background-color: #f44336;
+}
+
+/* Form */
+.form {
+    margin-top: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.form button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+/* Button Alignment */
+button.add, button.update, button.delete {
+    margin-right: 10px;
+}
+
+button.update {
+    margin-left: 10px;
+}
+
+
+/* src/main/resources/static/css/productmanagement.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex; /* Use flexbox for layout */
+}
+
+.header {
+    background-color: #333;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+    position: fixed; /* Fix header position */
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Ensure header is on top */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    padding-top: 80px; /* Adjust for fixed header */
+    height: 100vh; /* Full height sidebar */
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #ecf0f1;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    background-color: #34495e;
+}
+
+.content {
+    margin-left: 250px; /* Space for the fixed sidebar */
+    padding: 90px 20px 20px 20px; /* Adjust for fixed header */
+    flex-grow: 1; /* Allow content to take remaining space */
+}
+
+.card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th, .table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.table th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Basic styling for image in table */
+.table img {
+    max-width: 80px;
+    height: auto;
+    display: block;
+    margin: auto;
+}
+
+   /* Basic Layout CSS - you should move this to productmanagement.css or a global CSS file */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex; /* Use flexbox for main layout */
+            min-height: 100vh; /* Ensure body takes full viewport height */
+        }
+
+        .main-header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            width: 100%;
+            position: fixed; /* Fix header position */
+            top: 0;
+            left: 0;
+            z-index: 1000; /* Ensure header is on top */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .main-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .main-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .main-nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            transition: background-color 0.3s;
+        }
+
+        .main-nav ul li a:hover {
+            background-color: #555;
+            border-radius: 4px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 80px; /* Adjust for fixed header */
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh; /* Full height sidebar */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ecf0f1;
+            padding-top: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: #34495e;
+        }
+
+        .main-content-wrapper {
+            margin-left: 250px; /* Space for the fixed sidebar */
+            padding-top: 80px; /* Space for the fixed header */
+            flex-grow: 1; /* Allows content to take remaining space */
+            padding: 90px 20px 20px 20px; /* Top, Right, Bottom, Left padding */
+        }

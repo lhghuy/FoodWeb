@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TeamFOOD</title>
+    <link rel="stylesheet" th:href="@{/css/index.css}" />
+    <script>
+      window.onload = function () {
+        window.scrollTo(0, 0);
+      };
+    </script>
+  </head>
+  <body>
+    <div th:replace="fragments/header :: site-header"></div>
+    <div class="service-banner"></div>
+
+    <section class="banner">
+      <p>TeamFOOD – Đặt món dễ dàng, tận hưởng trọn vẹn!</p>
+      <button class="btn-primary">Đặt món ngay</button>
+    </section>
+
+    <section class="slideshow-container">
+      <div class="slide fade">
+        <img th:src="@{/images/slideshow2.avif}" alt="Slide 2" />
+      </div>
+      <div class="slide fade">
+        <img th:src="@{/images/slideshow3.jpg}" alt="Slide 3" />
+      </div>
+      <div class="slide fade">
+        <img th:src="@{/images/slideshow1.jpg}" alt="Slide 1" />
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="feature-item">
+        <span>❤️</span>
+        <h3>SẢN PHẨM AN TOÀN</h3>
+        <p>Cam kết chất lượng</p>
+      </div>
+      <div class="feature-item">
+        <span>👤</span>
+        <h3>HỖ TRỢ 24/7</h3>
+        <p>Tất cả các ngày</p>
+      </div>
+      <div class="feature-item">
+        <span>💰</span>
+        <h3>HOÀN TIỀN</h3>
+        <p>Nếu sản phẩm hư hỏng</p>
+      </div>
+    </section>
+
+    <section class="about">
+      <div class="about-content">
+        <div class="about-text">
+          <h2>Về chúng tôi</h2>
+          <p>
+            TeamFOOD là chuỗi nhà hàng hiện đại, phục vụ đa dạng món ăn từ lẩu
+            đậm đà và nhiều món ngon khác. Với thực đơn phong phú gồm hàng trăm
+            món ăn đặc sắc, thực khách có thể thỏa thích lựa chọn và thưởng thức
+            nguyên liệu tươi ngon như bò Mỹ nhập khẩu, cá hồi nguyên con, nấm
+            tươi theo mùa. Chỉ với một mức giá hợp lý, bạn sẽ có trải nghiệm ẩm
+            thực trọn vẹn, tiện lợi và chất lượng. TeamFOOD cam kết mang đến bữa
+            ăn ngon miệng và an toàn cho mọi khách hàng.
+          </p>
+          <a th:href="@{/menu}" class="cta-link">Xem thực đơn →</a>
+        </div>
+        <div class="about-image">
+          <img th:src="@{/images/about1.png}" alt="TeamFOOD" />
+        </div>
+      </div>
+    </section>
+
+    <h2>DANH MỤC MÓN ĂN</h2>
+    <div class="menu-wrapper">
+      <button class="prev">&#10094;</button>
+      <div class="menu-items">
+        <div class="menu-item">
+          <img th:src="@{/images/lau-thap-cam.jpg}" alt="LẨU" />
+          <h3>LẨU</h3>
+          <button class="xem">
+            <a th:href="@{/menu#hotpot}">Xem thêm</a>
+          </button>
+        </div>
+        <div class="menu-item">
+          <img th:src="@{/images/TRANG MIENG.jpg}" alt="TRÁNG MIỆNG" />
+          <h3>TRÁNG MIỆNG</h3>
+          <button class="xem">
+            <a th:href="@{/menu#hotpot}">Xem thêm</a>
+          </button>
+        </div>
+        <div class="menu-item">
+          <img th:src="@{/images/coke-zero.jpg}" alt="THỨC UỐNG" />
+          <h3>THỨC UỐNG</h3>
+          <button class="xem">
+            <a th:href="@{/menu#hotpot}">Xem thêm</a>
+          </button>
+        </div>
+      </div>
+      <button class="next">&#10095;</button>
+    </div>
+
+    <footer class="header-style">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img th:src="@{/images/logo.jpg}" alt="TeamFOOD" />
+          <span>TeamFOOD</span>
+        </div>
+        <div class="footer-info">
+          <span>© 2025 TeamFOOD. All Rights Reserved.</span>
+          <span>Email: foodhkdhotro@gmail.com</span>
+          <span>Hotline: 0868093133</span>
+          <a
+            href="https://www.facebook.com/lehonggiahuy2407"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Facebook</a
+          >
+          <a href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
+        </div>
+      </div>
+    </footer>
+
+    <script th:src="@{/js/menu.js}"></script>
+    <script th:src="@{/js/sideShow.js}"></script>
+    <script th:src="@{/js/menu1.js}"></script>
+    <script th:src="@{/js/menu-scroll.js}"></script>
+    <script th:src="@{/js/menu-modal.js}"></script>
+    <script>
+      function openMap(index) {
+        window.location.href = `/bando.html?store=${index}`;
+      }
+    </script>
+  </body>
+</html>

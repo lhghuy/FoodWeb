@@ -1,0 +1,86 @@
+
+	<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <title>Dịch vụ</title>
+</head>
+<body>
+    <div th:replace="fragments/header :: site-header"></div>
+      </div>
+
+    <div class="page-title">
+        <span class="icon">🛠️</span>
+        Dịch vụ <span class="badge" th:text="${events != null ? events.size(): '''TeamFoodHKD''' }">4</span>
+    </div>
+
+    <div class="main-content">
+       
+
+        <!-- Phần dịch vụ -->
+        <div class="services-section">
+            <!-- Dịch vụ 1 -->
+            <div class="service-item light-bg">
+                <div class="service-content">
+                    <div class="service-image">
+                        <img src="https://i.ytimg.com/vi/M2I1m8VowrQ/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGH8gSiglMA8=&rs=AOn4CLBRskJ78qiPJLdTbgkPy5PyCdFPIg" alt="Đặt tiệc sinh nhật">
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">Đặt tiệc sinh nhật</h3>
+                        <p class="service-description">Tổ chức tiệc sinh nhật trọn gói với thực đơn đa dạng và trang trí độc đáo.</p>
+                        <p class="service-time">Liên hệ để được tư vấn: 1900 1234</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dịch vụ 2 -->
+            <div class="service-item dark-bg">
+                <div class="service-content">
+                    <div class="service-image">
+                        <img src="https://images.unsplash.com/photo-1515169067868-5387ec356754" alt="FoodHKD Kid Club">
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">FoodHKD Kid Club</h3>
+                        <p class="service-description">Câu lạc bộ ẩm thực dành cho trẻ em với các món ăn lành mạnh và hoạt động thú vị.</p>
+                        <p class="service-time">Mở cửa: 10:00 - 18:00, Thứ Bảy & Chủ Nhật</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dịch vụ 3 -->
+            <div class="service-item light-bg">
+                <div class="service-content">
+                    <div class="service-image">
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="Đơn hàng lớn">
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">Đơn hàng lớn</h3>
+                        <p class="service-description">Dịch vụ cung cấp thực phẩm số lượng lớn cho sự kiện, hội nghị, hoặc tiệc tùng.</p>
+                        <p class="service-time">Đặt trước tối thiểu 48 giờ</p>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Dịch vụ 2 -->
+             <div class="service-item dark-bg">
+                <div class="service-content">
+                    <div class="service-image">
+                        <img src="https://baochauelec.com/cdn/images/nhac-acoustic-la-gi-10.jpg" alt="FoodHKD Acoustic">
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">FoodHKD Acoustic</h3>
+                        <p class="service-description">Câu lạc bộ Acoustic dành cho mọi người với các bản nhạc Acoustic hấp dẫn.</p>
+                        <p class="service-time">Mở cửa: 10:00 - 18:00, Thứ Bảy & Chủ Nhật</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: site-footer"></div>
+</body>
+</html>

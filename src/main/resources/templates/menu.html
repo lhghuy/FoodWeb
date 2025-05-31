@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" th:href="@{/css/index.css}" />
+    <link rel="stylesheet" th:href="@{/css/menu.css}" />
+    <title>Menu Nhà Hàng</title>
+  </head>
+  <body>
+    <div th:replace="fragments/header :: site-header"></div>
+    <div class="service-banner"></div>
+
+    <div class="menu-container">
+      <aside class="sidebar">
+        <h3>Danh mục</h3>
+        <ul>
+          <button class="scroll-btn" data-target="all">Tất cả</button>
+
+          <li th:each="category : ${categories}">
+            <button
+              class="scroll-btn"
+              th:attr="data-target=${category.name}"
+              th:text="${category.name}"
+            ></button>
+          </li>
+        </ul>
+
+        <ul>
+          <button class="scroll-btn" data-target="Món chính">Món chính</button>
+
+          <li th:each="category : ${categories}">
+            <button
+              class="scroll-btn"
+              th:attr="data-target=${category.name}"
+              th:text="${category.name}"
+            ></button>
+          </li>
+        </ul>
+
+        <ul>
+          <button class="scroll-btn" data-target="Lẩu">Lẩu</button>
+
+          <li th:each="category : ${categories}">
+            <button
+              class="scroll-btn"
+              th:attr="data-target=${category.name}"
+              th:text="${category.name}"
+            ></button>
+          </li>
+        </ul>
+
+        <ul>
+          <button class="scroll-btn" data-target="Đồ uống">Đồ uống</button>
+
+          <li th:each="category : ${categories}">
+            <button
+              class="scroll-btn"
+              th:attr="data-target=${category.name}"
+              th:text="${category.name}"
+            ></button>
+          </li>
+        </ul>
+
+        <ul>
+          <button class="scroll-btn" data-target="Tráng miệng">
+            Tráng miệng
+          </button>
+
+          <li th:each="category : ${categories}">
+            <button
+              class="scroll-btn"
+              th:attr="data-target=${category.name}"
+              th:text="${category.name}"
+            ></button>
+          </li>
+        </ul>
+
+        <ul>
+          <button class="scroll-btn" data-target="Món thêm">Món thêm</button>
+
+          <li th:each="category : ${categories}">
+            <button
+              class="scroll-btn"
+              th:attr="data-target=${category.name}"
+              th:text="${category.name}"
+            ></button>
+          </li>
+        </ul>
+      </aside>
+
+      <main class="menu-content">
+        <!-- Section Tất cả món ăn -->
+        <section class="menu-section" id="all">
+          <h2>Tất cả món ăn</h2>
+          <div class="menu-grid">
+            <div
+              class="menu-item"
+              th:each="food : ${allFoods}"
+              th:attr="data-cat=${food.category.categoryID}"
+            >
+              <img th:src="@{${food.anh}}" th:alt="${food.name}" />
+              <h3 th:text="${food.name}"></h3>
+              <p>
+                Giá bán:
+                <span
+                  class="price"
+                  th:text="${#numbers.formatDecimal(food.price, 0, 'POINT', 0, 'COMMA')} + ' VND'"
+                ></span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section Món chính -->
+        <section class="menu-section" id="Món chính">
+          <h2>Món chính</h2>
+          <div class="menu-grid">
+            <div
+              class="menu-item"
+              th:each="food : ${allFoods.?[category.categoryID == 1]}"
+              th:attr="data-cat=${food.category.categoryID}"
+            >
+              <img th:src="@{${food.anh}}" th:alt="${food.name}" />
+              <h3 th:text="${food.name}"></h3>
+              <p>
+                Giá bán:
+                <span
+                  class="price"
+                  th:text="${#numbers.formatDecimal(food.price, 0, 'POINT', 0, 'COMMA')} + ' VND'"
+                ></span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section Lẩu -->
+        <section class="menu-section" id="Lẩu">
+          <h2>Lẩu</h2>
+          <div class="menu-grid">
+            <div
+              class="menu-item"
+              th:each="food : ${allFoods.?[category.categoryID == 2]}"
+              th:attr="data-cat=${food.category.categoryID}"
+            >
+              <img th:src="@{${food.anh}}" th:alt="${food.name}" />
+              <h3 th:text="${food.name}"></h3>
+              <p>
+                Giá bán:
+                <span
+                  class="price"
+                  th:text="${#numbers.formatDecimal(food.price, 0, 'POINT', 0, 'COMMA')} + ' VND'"
+                ></span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section Đồ uống -->
+        <section class="menu-section" id="Đồ uống">
+          <h2>Đồ uống</h2>
+          <div class="menu-grid">
+            <div
+              class="menu-item"
+              th:each="food : ${allFoods.?[category.categoryID == 3]}"
+              th:attr="data-cat=${food.category.categoryID}"
+            >
+              <img th:src="@{${food.anh}}" th:alt="${food.name}" />
+              <h3 th:text="${food.name}"></h3>
+              <p>
+                Giá bán:
+                <span
+                  class="price"
+                  th:text="${#numbers.formatDecimal(food.price, 0, 'POINT', 0, 'COMMA')} + ' VND'"
+                ></span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section Tráng miệng -->
+        <section class="menu-section" id="Tráng miệng">
+          <h2>Tráng miệng</h2>
+          <div class="menu-grid">
+            <div
+              class="menu-item"
+              th:each="food : ${allFoods.?[category.categoryID == 4]}"
+              th:attr="data-cat=${food.category.categoryID}"
+            >
+              <img th:src="@{${food.anh}}" th:alt="${food.name}" />
+              <h3 th:text="${food.name}"></h3>
+              <p>
+                Giá bán:
+                <span
+                  class="price"
+                  th:text="${#numbers.formatDecimal(food.price, 0, 'POINT', 0, 'COMMA')} + ' VND'"
+                ></span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section Món thêm -->
+        <section class="menu-section" id="Món thêm">
+          <h2>Món thêm</h2>
+          <div class="menu-grid">
+            <div
+              class="menu-item"
+              th:each="food : ${allFoods.?[category.categoryID == 5]}"
+              th:attr="data-cat=${food.category.categoryID}"
+            >
+              <img th:src="@{${food.anh}}" th:alt="${food.name}" />
+              <h3 th:text="${food.name}"></h3>
+              <p>
+                Giá bán:
+                <span
+                  class="price"
+                  th:text="${#numbers.formatDecimal(food.price, 0, 'POINT', 0, 'COMMA')} + ' VND'"
+                ></span>
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script th:src="@{/js/menu.js}"></script>
+    <script>
+      document.querySelectorAll(".scroll-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          const targetId = this.getAttribute("data-target");
+          const targetSection = document.getElementById(targetId);
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: "smooth" });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+
+        .table-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 15px; 
+            margin-top: 20px;
+        }
+
+        .table-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-number {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-tag {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .status-trong {
+            background-color: #e6ffe6; 
+            color: #008000; 
+        }
+
+        .status-dangphucvu {
+            background-color: #ffe6e6; 
+            color: #ff0000; 
+        }
+
+        .table-actions button, .table-actions a {
+            padding: 8px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .btn-detail {
+            background-color: #007bff; 
+            color: white;
+        }
+
+        .btn-assign {
+            background-color: #28a745; 
+            color: white;
+        }
+
+        .btn-unassign {
+            background-color: #dc3545; 
+            color: white;
+        }
+
+        .assign-form {
+            margin-top: 10px;
+        }
+
+        .assign-form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .assign-form input[type="text"], .assign-form button {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+        }
+
+        .assign-form button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .assign-form button:hover {
+            background-color: #0056b3;
+        }

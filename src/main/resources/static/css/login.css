@@ -1,0 +1,128 @@
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header img {
+            height: 50px;
+        }
+        
+        header nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        main h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        form input {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        form button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        
+        .footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Căn giữa nội dung bên trong */
+    gap: 20px; /* Khoảng cách giữa logo và thông tin */
+    flex-wrap: wrap; /* Cho phép nội dung xuống dòng nếu màn hình nhỏ */
+    text-align: center; /* Căn giữa văn bản */
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-logo img {
+    height: 40px; /* Điều chỉnh kích thước logo */
+}
+
+.footer-logo span {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.footer-info {
+    display: flex;
+    gap: 15px; /* Khoảng cách giữa các phần tử trong footer-info */
+    align-items: center;
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu cần */
+}
+
+.footer-info span, .footer-info a {
+    font-size: 1em;
+    color: #fff; /* Chữ trắng */
+    text-decoration: none; /* Bỏ gạch chân cho liên kết */
+}
+
+.footer-info a:hover {
+    text-decoration: underline; /* Gạch chân khi hover */
+}
+
+.header-style {
+    background-color: #a81c2d; /* Màu đỏ giống banner */
+    color: #fff; /* Chữ trắng */
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center; /* Căn giữa nội dung footer */
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ giống header */
+}

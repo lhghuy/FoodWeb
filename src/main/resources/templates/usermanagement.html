@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}"/>
+</head>
+
+<body>
+<div class="sidebar1">
+    <h2>ADMIN</h2>
+    <ul>
+        <li><a th:href="@{/admin}">Dashboard</a></li>
+        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
+        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
+        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
+        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <h1>Quản Lý Nhân Viên</h1>
+        <div class="user-info">
+            <form th:action="@{/logout}" method="post" style="display: inline">
+                <button type="submit" class="btn-logout">Đăng xuất</button>
+            </form>
+            <span th:text="${loggedInUser.fullName}">Admin</span>
+        </div>
+    </div>
+
+    <!-- Bảng sản phẩm -->
+    <div class="card">
+        <h3>Danh sách Nhân viên</h3>
+        <button class="them">
+            <a th:href="@{/admin/users/add}" class="add-button"
+            >Thêm Nhân viên mới</a
+            >
+        </button>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>STT</th>
+                <th>Avatar</th>
+                <th>Tên đăng nhập</th>
+                <th>Họ và tên</th>
+                <th>Vai trò</th>
+                <th>Tác Vụ</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user, stat : ${users}">
+                <td th:text="${stat.index + 1}">1</td>
+                <td><img th:src="${user.avatar}" style="width: 100px; height: 100px" alt=""></td>
+                <td th:text="${user.username}">Tên đăng nhập</td>
+                <td th:text="${user.fullName}">Họ và tên</td>
+                <td th:text="${user.role}">Vai trò</td>
+                <td class="action-buttons">
+                    <button>
+                        <a
+                                th:href="@{/admin/users/edit/{id}(id=${user.userID})}"
+                                class="edit"
+                        >Sửa</a
+                        >
+                    </button>
+                    <button th:if="${user.userID != loggedInUser.userID}">
+                        <a
+                           th:href="@{/admin/users/delete/{id}(id=${user.userID})}"
+                           class="delete"
+                           onclick="return confirm('Bạn có chắc chắn muốn xóa nhân viên này?');">Xóa</a>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

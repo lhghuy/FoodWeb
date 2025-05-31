@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý bàn</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+         .table-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Tạo các cột tự động vừa vặn */
+            gap: 15px; /* Khoảng cách giữa các ô */
+            margin-top: 20px;
+        }
+
+        .table-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-number {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-tag {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .status-trong {
+            background-color: #e6ffe6; /* Xanh nhạt */
+            color: #008000; /* Xanh lá */
+        }
+
+        .status-dangphucvu {
+            background-color: #ffe6e6; /* Đỏ nhạt */
+            color: #ff0000; /* Đỏ */
+        }
+
+        .table-actions button, .table-actions a {
+            padding: 8px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .btn-detail {
+            background-color: #007bff; /* Xanh dương */
+            color: white;
+        }
+
+        .btn-assign {
+            background-color: #28a745; /* Xanh lá cây */
+            color: white;
+        }
+
+        .btn-unassign {
+            background-color: #dc3545; /* Đỏ */
+            color: white;
+        }
+
+        .assign-form {
+            margin-top: 10px;
+        }
+
+        .assign-form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .assign-form input[type="text"], .assign-form button {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+        }
+
+        .assign-form button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .assign-form button:hover {
+            background-color: #0056b3;
+        }
+        /* Modal background overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+        }
+
+        /* Modal box */
+        .modal-box {
+            background-color: #fff;
+            width: 400px;
+            max-width: 90%;
+            margin: 10% auto;
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        /* Form styling */
+        .modal-box h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .modal-box form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .modal-box form button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-box form button[type="submit"] {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .modal-box form button[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        .modal-box form button[type="button"] {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .modal-box form button[type="button"]:hover {
+            background-color: #c82333;
+        }
+
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <h2>NhanVien</h2>
+    <ul>
+        <li><a th:href="@{/employee}">Dashboard</a></li>
+        <li class="active"><a th:href="@{/employee/tables}">Quản lý bàn</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <h1>Quản lý bàn</h1>
+        <div class="user-info">
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Đăng xuất</button>
+            </form>
+            <span th:text="${loggedInUser}">Employee</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Danh sách bàn</h3>
+        <div class="table-grid-container">
+            <div class="table-item" th:each="table : ${tables}">
+                <div class="table-number" th:text="${table.tableNumber}"></div>
+                <div class="status-tag"
+                     th:classappend="${table.status == 'Trong' ? 'status-trong' : 'status-dangphucvu'}"
+                     th:text="${table.status == 'Trong' ? 'Trống' : 'Đang phục vụ'}"></div>
+                <div class="table-actions">
+                    <a th:href="@{/employee/tables/{id}(id=${table.tableID})}" class="btn-detail">Chi tiết</a>
+                    <form th:if="${table.status == 'Trong'}"
+                          th:action="@{/employee/tables/{id}/assign(id=${table.tableID})}" method="post"
+                          class="assign-form">
+                        <input type="text" th:id="'employee-' + ${table.tableID}" name="employee"
+                               value="Nhân viên hiện tại" readonly style="display: none;"/>
+                        <button type="submit" class="btn-assign">Gán bàn</button>
+                    </form>
+                </div>
+
+                <button type="button" class="btn-unassign"
+                        th:if="${table.status == 'DangPhucVu'}"
+                        th:attr="data-table-id=${table.tableID}"
+                        onclick="openPaymentModal(this)">
+                    Thanh toán
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="paymentOverlay" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Thông tin khách hàng</h3>
+        <form id="paymentForm" method="post">
+            <input type="hidden" id="modal-table-id" name="tableId" />
+            <label>Họ tên:</label>
+            <input type="text" name="fullName" required>
+            <label>Số điện thoại:</label>
+            <input type="text" name="phone" required 
+                   pattern="\d{10}" 
+                   maxlength="10" 
+                   minlength="10" 
+                   inputmode="numeric"
+                   title="Số điện thoại phải gồm đúng 10 chữ số">
+            <div style="text-align: right;">
+                <button type="submit">Xác nhận</button>
+                <button type="button" onclick="closePaymentModal()">Hủy</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openPaymentModal(button) {
+        const tableId = button.getAttribute('data-table-id');
+        document.getElementById('modal-table-id').value = tableId;
+        document.getElementById('paymentForm').action = `/employee/tables/${tableId}/checkout`;
+        document.getElementById('paymentOverlay').style.display = 'block';
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentOverlay').style.display = 'none';
+    }
+
+    document.getElementById("paymentForm").addEventListener("submit", function(e) {
+        const phone = this.phone.value.trim();
+        if (!/^\d{10}$/.test(phone)) {
+            alert("Số điện thoại phải gồm đúng 10 chữ số.");
+            e.preventDefault();
+        }
+    });
+</script>
+</body>
+</html>

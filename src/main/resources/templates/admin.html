@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+<div class="sidebar">
+    <h2>ADMIN</h2>
+    <ul>
+        <li><a th:href="@{/admin}">Dashboard</a></li>
+        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
+        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
+        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
+        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <h1>Dashboard</h1>
+        <div class="user-info">
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Đăng xuất</button>
+            </form>
+
+            <img th:src="@{${loggedInUser.avatar}}" alt="Avatar" class="user-avatar"/>
+
+            <span th:text="${loggedInUser.fullName}" style="width: 100px; height: 100px">Admin</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Nhân viên</h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Tên</th>
+                <th>Chức vụ</th>
+                <th>Email</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="emp : ${employees}">
+                <td th:text="${emp.name}"></td>
+                <td th:text="${emp.role}"></td>
+                <td th:text="${emp.email}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

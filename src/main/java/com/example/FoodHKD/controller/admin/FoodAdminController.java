@@ -1,0 +1,91 @@
+package com.example.FoodHKD.controller.admin;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute; // For form binding
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping; // For submitting forms
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.example.FoodHKD.model.FoodItem;
+import com.example.FoodHKD.service.CategoryService; // Assuming you have a CategoryService
+import com.example.FoodHKD.service.FoodItemService;
+
+import jakarta.validation.Valid;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/admin/foods")
+public class FoodAdminController {
+
+    @Autowired
+    private FoodItemService foodItemService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @GetMapping
+    public String getAll(Model model) {
+        List<FoodItem> foodItems = foodItemService.getAllFoodItems();
+        model.addAttribute("products", foodItems);
+        return "productmanagement";
+    }
+
+    @GetMapping("/add")
+    public String showAddForm(Model model) {
+        model.addAttribute("foodItem", new FoodItem());
+        model.addAttribute("categories", categoryService.getAllCategories());
+        return "productform";
+    }
+
+    @PostMapping("/add")
+    public String addFoodItem(@ModelAttribute("foodItem") @Valid FoodItem foodItem,
+                          BindingResult result,
+                          Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("categories", categoryService.getAllCategories()); 
+            return "productform";
+        }
+        foodItemService.createFoodItem(foodItem);
+        return "redirect:/admin/foods";
+}
+
+
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable("id") Integer id, Model model) {
+        FoodItem foodItem = foodItemService.getFoodItemById(id);
+        model.addAttribute("foodItem", foodItem);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        return "productform";
+    }
+
+   @PostMapping("/edit/{id}")
+    public String updateFoodItem(@PathVariable("id") Integer id,
+                             @ModelAttribute("foodItem") @Valid FoodItem foodItem,
+                             BindingResult result,
+                             Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("categories", categoryService.getAllCategories());
+            return "productform";
+        }
+        foodItemService.updateFoodItem(id, foodItem);
+        return "redirect:/admin/foods";
+}
+
+
+    @GetMapping("/delete/{id}")
+    public String deleteFoodItem(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            foodItemService.deleteFoodItem(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Xoá món ăn thành công!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/foods";
+    }
+}

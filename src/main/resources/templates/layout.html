@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle ?: 'Quản lý Hệ thống'}"></title>
+    <link rel="stylesheet" th:href="@{/css/productmanagement.css}">
+</head>
+<body>
+
+<header th:fragment="header" class="main-header">
+    <div class="header-content">
+        <h1>Hệ thống Quản lý Thực phẩm HKD</h1>
+        <nav class="main-nav">
+            <ul>
+                <li><a th:href="@{/admin/foods}">Quản lý Sản phẩm</a></li>
+                <li><a th:href="@{/admin/staff}">Quản lý Nhân viên</a></li>
+                <li><a th:href="@{/admin/revenue}">Thống kê Doanh thu</a></li>
+                <li><a th:href="@{/logout}">Đăng xuất</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<aside th:fragment="sidebar" class="sidebar">
+    <h2>ADMIN</h2>
+    <ul>
+        <li><a th:href="@{/admin/foods}" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/foods') ? 'active' : ''}">Quản lý sản phẩm</a></li>
+        <li><a th:href="@{/admin/staff}" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/staff') ? 'active' : ''}">Quản lý nhân viên</a></li>
+        <li><a th:href="@{/admin/revenue}" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/revenue') ? 'active' : ''}">Thống kê doanh thu</a></li>
+    </ul>
+</aside>
+
+<div th:fragment="content" class="main-content-wrapper">
+</div>
+
+</body>
+</html>

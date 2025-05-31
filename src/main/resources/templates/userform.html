@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${user.userID == null ? 'Thêm Nhân viên mới' : 'Sửa thông tin Nhân viên'}"></title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+   
+</head>
+
+<body>
+<div class="sidebar">
+    <h2>ADMIN</h2>
+    <ul>
+        <li><a th:href="@{/admin}">Dashboard</a></li>
+        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
+        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
+        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
+        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <h1>Quản Lý Nhân Viên</h1>
+        <div class="user-info">
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Đăng xuất</button>
+            </form>
+            <span th:text="${loggedInUser}">Admin</span>
+        </div>
+    </div>
+    <div class="card">
+
+        <h3 th:text="${user.userID == null ? 'Thêm Nhân viên mới' : 'Sửa thông tin Nhân viên'}"></h3>
+
+        <form th:action="${user.userID == null ? '/admin/users/add' : '/admin/users/edit/' + user.userID}" th:object="${user}" method="post">
+            <div class="form-group">
+                <label for="username">Tên đăng nhập:</label>
+                <input type="text" id="username" th:field="*{username}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="passwordHash">Mật khẩu:</label>
+                <input type="password" id="passwordHash" th:field="*{passwordHash}" th:required="${user.userID == null}">
+                <small th:if="${user.userID != null}">Để trống nếu không muốn thay đổi mật khẩu.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="fullName">Họ và tên:</label>
+                <input type="text" id="fullName" th:field="*{fullName}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="avatar">Avatar:</label>
+                <input type="text" id="avatar" th:field="*{avatar}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Vai trò:</label>
+                <select id="role" th:field="*{role}">
+                    <option value="NhanVien">Nhân Viên</option>
+                    <option value="QuanLy">Quản Lý</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <a th:href="@{/admin/users}" class="cancel-button">Hủy</a>
+                <button type="submit" th:text="${user.userID == null ? 'Thêm Nhân viên' : 'Cập nhật'}"></button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

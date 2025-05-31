@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+<body>
+<div class="sidebar">
+    <h2>ADMIN</h2>
+    <ul>
+        <li><a th:href="@{/admin}">Dashboard</a></li>
+        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>    
+        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
+        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
+        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>    
+    </ul>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <h1>Sửa Món Ăn</h1>
+        <div class="user-info">
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Đăng xuất</button>
+            </form>
+            <span th:text="${loggedInUser}">Admin</span>
+        </div>
+    </div>
+
+    <div class="card">
+
+        <h3 th:text="${foodItem.foodID == null ? 'Thêm sản phẩm mới' : 'Sửa sản phẩm'}"></h3>
+
+        <form th:action="${foodItem.foodID == null ? '/admin/foods/add' : '/admin/foods/edit/' + foodItem.foodID}" th:object="${foodItem}" method="post">
+            <div class="form-group">
+                <label for="name">Tên sản phẩm:</label>
+                <input type="text" id="name" th:field="*{name}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Mô tả:</label>
+                <textarea id="description" th:field="*{description}" rows="4"></textarea>
+            </div>
+
+           <div class="form-group" style="position: relative;">
+                <label for="price">Giá:</label>
+                <input type="number" th:field="*{price}" step="0.01" min="0" required style="padding-right: 50px;" />
+                <span style="position: absolute; right: 10px; top: 32px; color: #666;">VND</span>
+                <div style="font-size: 0.85em; color: #888; margin-top: 4px;">Ví dụ: 100000 → 100,000VND</div>
+                <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger" style="font-size: 0.9em;"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="anh">URL Ảnh:</label>
+                <input type="text" id="anh" th:field="*{anh}">
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Số lượng:</label>
+                <input type="number" id="quantity" th:field="*{quantity}" min="1" step="1" required />
+                <div th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}" class="text-danger" style="font-size: 0.9em;"></div>
+            </div>
+
+
+            <div class="form-group">
+                <label for="category">Danh mục:</label>
+                <select id="category" th:field="*{category.categoryID}">
+                    <option th:each="cat : ${categories}" th:value="${cat.categoryID}" th:text="${cat.name}"></option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <a th:href="@{/admin/foods}" class="cancel-button">Hủy</a>
+                <button type="submit" th:text="${foodItem.foodID == null ? 'Thêm sản phẩm' : 'Cập nhật'}"></button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

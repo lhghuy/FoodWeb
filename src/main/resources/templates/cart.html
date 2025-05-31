@@ -1,0 +1,83 @@
+
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sự kiện</title>
+  <link rel="stylesheet" th:href="@{/css/cart.css}">
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+<body>
+
+  <div th:replace="fragments/header :: site-header"></div>
+    <div class="service-banner">
+      </div>
+
+  <div class="page-title">
+    <span class="icon">🎉</span> 
+    Sự kiện <span class="badge" th:text="${events != null ? events.size(): '''TeamFoodHKD''' }">4</span>
+  </div>
+
+  <div class="main-content">
+    
+
+   
+    <div class="events-section">
+      <div class="event-item light-bg">
+        <div class="event-content event-content-left">
+          <div class="event-image">
+            <img src="https://dulichviet.com.vn/images/bandidau/van-hoa-am-thuc-viet-nam-co-gi-hap-dan-du-khach-khap-the-gioi.jpg" alt="Sự kiện 1">
+          </div>
+          <div class="event-info">
+            <h3 class="event-title">Sự Kiện Mừng Thành Lập TeamFoodHKD</h3>
+            <p class="event-description">Chào mừng bạn đến với TeamFoodHKD</p>
+            <p class="event-time">23/05/2025 18:00 - 21:00</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-item dark-bg">
+        <div class="event-content event-content-right">
+          <div class="event-image">
+            <img src="https://th.bing.com/th/id/OIP.JGcNj7AOtXYpJyTFpx3BggHaE8?cb=iwc2&rs=1&pid=ImgDetMain" alt="Sự kiện 2">
+          </div>
+          <div class="event-info">
+            <h3 class="event-title">Khuyến Mãi Mùa Hè 2025</h3>
+            <p class="event-description">Giảm giá 20% cho tất cả món ăn</p>
+            <p class="event-time">01/06/2025 10:00 - 14:00</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-item light-bg">
+        <div class="event-content event-content-left">
+          <div class="event-image">
+            <img src="https://aztraining.vn/wp-content/uploads/2023/02/yeu-to-lich-su.jpg" alt="Sự kiện 3">
+          </div>
+          <div class="event-info">
+            <h3 class="event-title">Ngày Hội Ẩm Thực Châu Á</h3>
+            <p class="event-description">Trải nghiệm các món ăn đặc sắc</p>
+            <p class="event-time">15/06/2025 12:00 - 20:00</p>
+          </div>
+        </div>
+      </div>
+   
+      <div class="event-item dark-bg">
+        <div class="event-content event-content-right">
+          <div class="event-image">
+            <img src="https://aztraining.vn/wp-content/uploads/2023/02/am-thuc-la-gi.jpg" alt="Sự kiện 4">
+          </div>
+          <div class="event-info">
+            <h3 class="event-title">Lễ Hội Trung Thu</h3>
+            <p class="event-description">Chương trình bánh trung thu miễn phí</p><p class="event-time">20/09/2025 17:00 - 22:00</p>
+          </div>
+        </div>
+    </div>
+    </div>
+  </div>
+
+  <div th:replace="fragments/footer :: site-footer"></div>
+</body>
+</html>

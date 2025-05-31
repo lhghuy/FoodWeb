@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết bàn</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+<div class="sidebar">
+    <h2>ADMIN</h2>
+    <ul>
+        <li><a th:href="@{/admin}">Dashboard</a></li>
+        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
+        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
+        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
+        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <h1>Chi tiết bàn <span th:text="${table.tableNumber}"></span></h1>
+        <div class="user-info">
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Đăng xuất</button>
+            </form>
+            <span th:text="${loggedInUser}">Employee</span>
+        </div>
+    </div>
+
+    <div class="card detail-container">
+        <h3>Thông tin bàn</h3>
+        <p><strong>Số bàn:</strong> <span th:text="${table.tableNumber}"></span></p>
+        <p><strong>Trạng thái:</strong> <span th:text="${table.status == 'Trong' ? 'Trống' : 'Đang phục vụ'}"></span></p>
+        <p><strong>Nhân viên phụ trách:</strong> <span th:text="${table.employee != null ? table.employee.fullName : 'Chưa có'}"></span></p>
+
+        <h3 class="mt-3">Các món đã gọi</h3>
+        <table class="table" th:if="${not #lists.isEmpty(tableDetails)}">
+            <thead>
+            <tr>
+                <th>Tên món</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Tổng tiền món</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="detail : ${tableDetails}">
+                <td th:text="${detail.foodItem.name}"></td>
+                <td th:text="${detail.quantity}"></td>
+                <td th:text="${#numbers.formatDecimal(detail.foodItem.price, 0, 'POINT', 3, 'COMMA')} + ' vnđ'"></td>
+                <td th:text="${#numbers.formatDecimal(detail.totalPrice, 0, 'POINT', 3, 'COMMA')} + ' vnđ'"></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3" class="text-right font-weight-bold">Tổng tiền:</td>
+                <td class="font-weight-bold">
+                    <span th:text="${#numbers.formatDecimal(totalPrice, 0, 'POINT', 3, 'COMMA')}"></span>đ
+                </td>
+                <td></td>
+            </tr>
+            </tfoot>
+        </table>
+        <p class="alert alert-info" th:if="${#lists.isEmpty(tableDetails)}">Bàn này chưa có món nào.</p>
+    </div>
+
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

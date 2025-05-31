@@ -1,0 +1,125 @@
+
+body {
+  background-color: #fff; /* Nền trắng */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #a81c2d; /* Màu đỏ chủ đạo */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure body takes full viewport height */
+}
+
+
+.page-title {
+  font-size: 1.8em;
+  padding: 15px;
+  background-color: #a81c2d; /* Nền đỏ */
+  color: #fff; /* Chữ trắng */
+  text-align: center;
+  margin: 0; /* Remove margin to stick to top */
+  font-weight: bold;
+}
+
+.page-title .badge {
+  background-color: #fff; /* Nền trắng cho badge */
+  color: #a81c2d; /* Chữ đỏ */
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.8em;
+}
+
+.page-title .icon {
+  font-size: 28px;
+  vertical-align: middle;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  flex: 1; /* Allow main content to take remaining space */
+}
+
+
+.services-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.service-item {
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.service-item.light-bg {
+  background-color: #f5f5f5; /* Trắng nhạt */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.service-item.dark-bg {
+  background-color: #e8e8e8; /* Trắng đậm */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.service-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.service-image img {
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.service-info {
+  flex: 1;
+}
+
+.service-title {
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+
+.service-description {
+  font-size: 16px;
+  color: #555;
+  margin: 0 0 10px;
+}
+
+.service-time {
+  font-size: 14px;
+  color: #888;
+}
+
+
+.service-item {
+  opacity: 0;
+  animation: fadeInAnimation 1.0s forwards;
+}
+
+.service-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.service-item:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.service-item:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+.service-item:nth-child(4) {
+  animation-delay: 0.7s;
+}
+
+@keyframes fadeInAnimation {
+  to {
+    opacity: 1;
+  }
+}

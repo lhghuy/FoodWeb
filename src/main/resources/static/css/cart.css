@@ -1,0 +1,155 @@
+body {
+  background-color: #fff; /* Nền trắng */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #a81c2d; /* Màu đỏ chủ đạo */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure body takes full viewport height */
+}
+
+
+.page-title {
+  font-size: 1.8em;
+  padding: 15px;
+  background-color: #a81c2d; /* Nền đỏ */
+  color: #fff; /* Chữ trắng */
+  text-align: center;
+  margin: 0; /* Remove margin to stick to top */
+  font-weight: bold;
+}
+
+.page-title .badge {
+  background-color: #fff; /* Nền trắng cho badge */
+  color: #a81c2d; /* Chữ đỏ */
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.8em;
+}
+
+.page-title .icon {
+  font-size: 28px;
+  vertical-align: middle;
+}
+
+.main-content {
+  padding: 20px;
+}
+
+
+.events-section {
+  margin: 20px 0;
+}
+
+.event-item {
+  padding: 10px; /* Padding nhỏ */
+  margin-bottom: 0; /* Loại bỏ khoảng cách dưới */
+}
+
+.light-bg {
+  background-color: #f5f5f5; /* Trắng nhạt */
+}
+
+.dark-bg {
+  background-color: #e8e8e8; /* Trắng đậm */
+}
+
+.event-content {
+  display: flex;
+  flex-direction: row; /* Đặt ảnh và thông tin cạnh nhau */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  width: 80%; /* Tăng chiều rộng để chứa ảnh lớn hơn */
+  gap: 20px; /* Khoảng cách giữa ảnh và thông tin */
+}
+
+.event-content-left {
+  margin-left: 0;
+  margin-right: auto; /* Đẩy nội dung về bên trái */
+}
+
+.event-content-left .event-image {
+  order: 1; /* Ảnh bên trái */
+}
+
+.event-content-left .event-info {
+  order: 2; /* Thông tin bên phải ảnh */
+}
+
+.event-content-right {
+  margin-left: auto; /* Đẩy nội dung về bên phải */
+  margin-right: 0;
+}
+
+.event-content-right .event-image {
+  order: 2; /* Ảnh bên phải */
+}
+
+.event-content-right .event-info {
+  order: 1; /* Thông tin bên trái ảnh */
+}
+
+.event-image {
+  width: 500px; /* Tăng kích thước ảnh từ 400px lên 500px */
+  height: 250px; /* Tăng từ 200px lên 250px */
+  background-color: #fff; /* Nền trắng */
+  border: 3px solid #a81c2d; /* Viền đỏ */
+  overflow: hidden;
+}
+
+.event-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-info {
+  flex: 1; /* Thông tin chiếm không gian còn lại */
+  text-align: left; /* Căn trái thông tin */
+}
+
+.event-title {
+  font-size: 1.5em; /* Kích thước tiêu đề */
+  font-weight: bold;
+  color: #a81c2d;
+  margin-bottom: 5px;
+}
+
+.event-description {
+  font-size: 1.1em; /* Kích thước mô tả */
+  color: #a81c2d;
+  margin-bottom: 5px;
+}
+
+.event-time {
+  font-size: 1.1em; /* Kích thước thời gian */
+  font-weight: bold;
+  color: #a81c2d;
+}
+
+.event-item {
+  opacity: 0;
+  animation: fadeInAnimation 1.0s forwards;
+}
+
+.event-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.event-item:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.event-item:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.event-item:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
+@keyframes fadeInAnimation {
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}" />
+  </head>
+
+  <body>
+    <div class="sidebar">
+      <h2>ADMIN</h2>
+      <ul>
+        <li><a th:href="@{/admin}">Dashboard</a></li>
+        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
+        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
+        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
+        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
+      </ul>
+    </div>
+
+    <div class="main-content">
+      <div class="header">
+        <h1>Quản Lý Hóa Đơn</h1>
+        <div class="user-info">
+          <form th:action="@{/logout}" method="post" style="display: inline">
+            <button type="submit" class="btn-logout">Đăng xuất</button>
+          </form>
+          <span th:text="${loggedInUser}">Admin</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Danh sách Hóa đơn</h2>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Khách hàng</th>
+              <th>Ngày tạo</th>
+              <th>Bàn</th>
+              <th>Nhân viên</th>
+              <th>Tác Vụ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="order : ${orders}">
+              <td th:text="${order.orderID}">1</td>
+              <td th:text="${order.fullName}">Khách</td>
+              <td
+                th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"
+              >
+                01/01/2024
+              </td>
+              <td th:text="${order.table.tableNumber}">B01</td>
+              <td th:text="${order.createdBy.fullName}">Nhân viên</td>
+              <td>
+                <button class="xem">
+                  <a th:href="@{/admin/orders/{id}(id=${order.orderID})}"
+                    >Xem</a
+                  >
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

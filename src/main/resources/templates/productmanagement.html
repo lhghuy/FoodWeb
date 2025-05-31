@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}"/>
+</head>
+
+<body>
+<div class="sidebar">
+    <h2>ADMIN</h2>
+    <ul>
+        <li><a th:href="@{/admin}">Dashboard</a></li>
+        <li><a th:href="@{/admin/foods}">Quản lý sản phẩm</a></li>
+        <li><a th:href="@{/admin/tables}">Quản lý bàn</a></li>
+        <li><a th:href="@{/admin/users}">Quản lý nhân viên</a></li>
+        <li><a th:href="@{/admin/orders}">Quản lý hoá đơn</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+    <div class="header">
+        <h1>Quản Lý Món Ăn</h1>
+        <div class="user-info">
+            <form th:action="@{/logout}" method="post" style="display: inline">            
+                <button type="submit" class="btn-logout">Đăng xuất</button>
+            </form>
+            <span th:text="${loggedInUser}">Admin</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Danh sách sản phẩm</h3>
+        <button class="them">
+            <a th:href="@{/admin/foods/add}" class="add-button"
+            >Thêm sản món ăn mới</a
+            >
+        </button>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên sản phẩm</th>
+                <th>Mô tả</th>
+                <th>Giá</th>
+                <th>Ảnh</th>
+                <th>Số lượng</th>
+                <th>Danh mục</th>
+                <th>Tác Vụ</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p, stat : ${products}">
+                <td th:text="${stat.index + 1}">1</td>
+                <td th:text="${p.name}">Tên SP</td>
+                <td th:text="${p.description}">Mô tả</td>
+                <td th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">Giá</td>
+                <td>
+                    <img
+                            th:src="${p.anh}"
+                            alt="Food Image"
+                            style="width: 50px; height: 50px; object-fit: cover"
+                    />
+                </td>
+                <td th:text="${p.quantity}">Số lượng</td>
+                <td th:text="${p.category.name}">Danh mục</td>
+                <td class="action-buttons">
+                    <button>
+                        <a
+                                th:href="@{/admin/foods/edit/{id}(id=${p.foodID})}"
+                                class="edit"
+                        >Sửa</a
+                        >
+                    </button>
+                    <button>
+                        <a
+                                th:href="@{/admin/foods/delete/{id}(id=${p.foodID})}"
+                                class="delete"
+                                onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');"
+                        >Xóa</a
+                        >
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
